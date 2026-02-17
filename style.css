@@ -5,198 +5,214 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: #333;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* 导航栏 */
-.navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 100;
-}
-
-.navbar .container {
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                url('https://media-cdn-zspms.kurogame.com/pnswebsite/website2.0/images/1765382400000/yf53h10clle4uzsizr-17654217357318.png') center / cover fixed;
+    min-height: 100vh;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.nav-links {
+.chat-container {
+    width: 100%;
+    max-width: 500px;
+    height: 80vh;
     display: flex;
-    list-style: none;
-    gap: 2rem;
+    flex-direction: column;
+    animation: slideUp 0.5s ease-out;
 }
 
-.nav-links a {
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 对话框样式 */
+.chat-box {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    overflow-y: auto;
+    border: 2px solid rgba(100, 100, 150, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.chat-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* 消息区域 */
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    display: flex;
+    animation: messageSlide 0.4s ease-out;
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message.user-message {
+    justify-content: flex-end;
+}
+
+.message.ai-message {
+    justify-content: flex-start;
+}
+
+/* 消息气泡 */
+.message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.ai-message .message-bubble {
+    background: rgba(50, 100, 200, 0.8);
+    color: #ffffff;
+    text-align: left;
+}
+
+.user-message .message-bubble {
+    background: rgba(100, 200, 100, 0.8);
+    color: #ffffff;
+    text-align: right;
+}
+
+.message-bubble p {
+    font-size: 16px;
+    line-height: 1.4;
+    margin: 0 0 6px 0;
+}
+
+.timestamp {
+    font-size: 12px;
+    opacity: 0.7;
+    display: block;
+    margin-top: 4px;
+}
+
+/* 输入框区域 */
+.input-area {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    border: 2px solid rgba(100, 100, 150, 0.3);
+}
+
+.message-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    resize: none;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    max-height: 100px;
+}
+
+.message-input:focus {
+    border-color: rgba(100, 200, 255, 0.6);
+    box-shadow: 0 0 10px rgba(100, 200, 255, 0.3);
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.message-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 发送按钮 */
+.send-button {
+    width: 70px;
+    background: linear-gradient(135deg, #00aaff 0%, #0077dd 100%);
     color: white;
-    text-decoration: none;
-    transition: opacity 0.3s;
-}
-
-.nav-links a:hover {
-    opacity: 0.8;
-}
-
-/* 英雄部分 */
-.hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 80px 0;
-    text-align: center;
-}
-
-.hero h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-}
-
-.hero p {
-    font-size: 1.1rem;
-    margin-bottom: 2rem;
-}
-
-.btn {
-    display: inline-block;
-    background: white;
-    color: #667eea;
-    padding: 12px 30px;
-    border-radius: 5px;
-    text-decoration: none;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: bold;
-    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 170, 255, 0.3);
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+.send-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 170, 255, 0.5);
+    background: linear-gradient(135deg, #00ccff 0%, #0099ff 100%);
 }
 
-/* 关于部分 */
-.about {
-    padding: 60px 0;
-    background: #f8f9fa;
+.send-button:active {
+    transform: scale(0.95);
 }
 
-.about h2,
-.projects h2,
-.contact h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-    color: #667eea;
-}
-
-.about p {
-    max-width: 600px;
-    margin: 0 auto;
-    text-align: center;
-    color: #666;
-}
-
-/* 项目部分 */
-.projects {
-    padding: 60px 0;
-}
-
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.project-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.project-card h3 {
-    color: #667eea;
-    margin-bottom: 1rem;
-}
-
-.project-card p {
-    color: #666;
-    margin-bottom: 1rem;
-}
-
-.project-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-}
-
-.project-link:hover {
-    color: #764ba2;
-}
-
-/* 联系部分 */
-.contact {
-    background: #f8f9fa;
-    padding: 60px 0;
-    text-align: center;
-}
-
-.contact p {
-    margin: 1rem 0;
-    color: #666;
-}
-
-.contact a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.contact a:hover {
-    text-decoration: underline;
-}
-
-/* 页脚 */
-footer {
-    background: #333;
-    color: white;
-    text-align: center;
-    padding: 2rem;
+.send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: scale(1);
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
-    .nav-links {
-        gap: 1rem;
+@media (max-width: 600px) {
+    .chat-container {
+        max-width: 100%;
+        height: 85vh;
     }
 
-    .hero h2 {
-        font-size: 1.8rem;
+    .message-bubble {
+        max-width: 85%;
     }
 
-    .project-grid {
-        grid-template-columns: 1fr;
+    .send-button {
+        width: 60px;
+        font-size: 12px;
+    }
+
+    .message-input {
+        font-size: 14px;
     }
 }

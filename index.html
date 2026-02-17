@@ -3,70 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucia - 个人网站</title>
+    <title>露西亚 - 灰鸦小队</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container">
-            <h1 class="logo">Lucia</h1>
-            <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#about">关于</a></li>
-                <li><a href="#projects">项目</a></li>
-                <li><a href="#contact">联系</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <section id="home" class="hero">
-        <div class="container">
-            <h2>欢迎来到我的个人网站</h2>
-            <p>这是一个使用 GitHub Pages 创建的个人网站</p>
-            <a href="#projects" class="btn">查看我的项目</a>
-        </div>
-    </section>
-
-    <section id="about" class="about">
-        <div class="container">
-            <h2>关于我</h2>
-            <p>这里可以介绍你自己、你的技能、经历等等。使用 GitHub Pages 和这个模板，你可以快速创建一个专业的个人网站。</p>
-        </div>
-    </section>
-
-    <section id="projects" class="projects">
-        <div class="container">
-            <h2>我的项目</h2>
-            <div class="project-grid">
-                <div class="project-card">
-                    <h3>项目 1</h3>
-                    <p>描述你的第一个项目</p>
-                    <a href="#" class="project-link">了解更多</a>
-                </div>
-                <div class="project-card">
-                    <h3>项目 2</h3>
-                    <p>描述你的第二个项目</p>
-                    <a href="#" class="project-link">了解更多</a>
-                </div>
-                <div class="project-card">
-                    <h3>项目 3</h3>
-                    <p>描述你的第三个项目</p>
-                    <a href="#" class="project-link">了解更多</a>
+    <div class="chat-container">
+        <!-- 对话框 -->
+        <div class="chat-box">
+            <div class="messages" id="messagesContainer">
+                <div class="message ai-message">
+                    <div class="message-bubble">
+                        <p>这里是灰鸦小队队长，露西亚。很高兴认识你。</p>
+                        <span class="timestamp">12:00 PM</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2>联系我</h2>
-            <p>电子邮件: your-email@example.com</p>
-            <p>GitHub: <a href="https://github.com/jas2233" target="_blank">jas2233</a></p>
+        <!-- 输入框 -->
+        <div class="input-area">
+            <textarea id="messageInput" class="message-input" placeholder="输入消息... (Shift + Enter 换行)" rows="1"></textarea>
+            <button id="sendBtn" class="send-button">发送</button>
         </div>
-    </section>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 Lucia. 保留所有权利。</p>
-    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
