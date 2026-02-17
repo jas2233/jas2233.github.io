@@ -1,2 +1,69 @@
-# Lucia.github.io
-This is a website about Lucia from Punishing:Grey Raven.
+# 我的个人网站
+
+这是一个使用 GitHub Pages 创建的个人网站。
+
+## 📝 介绍
+
+欢迎来到我的个人网站！这个网站展示了我的项目、技能和联系方式。
+
+## 🌐 访问网站
+
+你的网站现在已经可以访问：https://lucia.github.io
+
+## 📂 文件结构
+
+```
+.
+├── index.html          # 网站主页
+├── style.css          # 网站样式
+└── README.md          # 本文件
+```
+
+## 🎨 自定义网站
+
+### 修改内容
+
+编辑 `index.html` 文件，替换以下内容：
+- 你的名字和标题
+- 个人介绍
+- 项目描述
+- 联系方式
+
+### 修改样式
+
+编辑 `style.css` 文件，你可以：
+- 更改颜色（搜索 `#667eea` 和 `#764ba2`）
+- 调整字体大小
+- 修改布局和间距
+
+## 🚀 部署流程
+
+1. 编辑文件
+2. 保存更改
+3. 使用 git 提交并推送到 GitHub (main 分支)
+4. GitHub Pages 会自动部署，几秒内你的网站就会更新
+
+```bash
+git add .
+git commit -m "更新网站内容"
+git push origin main
+```
+
+## 💡 添加功能建议
+
+- 添加更多项目
+- 添加博客部分
+- 集成联系表单
+- 添加深色主题切换
+- 优化 SEO
+
+## 📞 联系
+
+更新 `index.html` 中的联系方式部分，添加你的：
+- 电子邮件
+- GitHub 链接
+- LinkedIn、Twitter 等社交媒体
+
+---
+
+设置完成！现在开始定制你的网站吧！
