@@ -22,6 +22,7 @@ body {
     display: flex;
     flex-direction: column;
     animation: slideUp 0.5s ease-out;
+    position: relative;
 }
 
 @keyframes slideUp {
@@ -194,6 +195,155 @@ body {
     opacity: 0.5;
     cursor: not-allowed;
     transform: scale(1);
+}
+
+/* 设置按钮 */
+.settings-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(100, 150, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-btn:hover {
+    background: rgba(100, 150, 255, 1);
+    transform: scale(1.1);
+}
+
+/* 设置面板 */
+.settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.settings-panel.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.settings-content {
+    background: rgba(20, 20, 40, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    border: 2px solid rgba(100, 150, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.settings-content h3 {
+    color: #00aaff;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.settings-content label {
+    display: block;
+    color: #ffffff;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.api-key-input {
+    width: 100%;
+    padding: 10px 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(100, 150, 255, 0.5);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.api-key-input:focus {
+    border-color: rgba(100, 200, 255, 0.8);
+    box-shadow: 0 0 10px rgba(100, 200, 255, 0.3);
+}
+
+.settings-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.settings-save-btn,
+.settings-clear-btn,
+.settings-close-btn {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.settings-save-btn {
+    background: rgba(0, 200, 100, 0.8);
+    color: white;
+}
+
+.settings-save-btn:hover {
+    background: rgba(0, 220, 120, 1);
+    transform: translateY(-2px);
+}
+
+.settings-clear-btn {
+    background: rgba(200, 100, 0, 0.8);
+    color: white;
+}
+
+.settings-clear-btn:hover {
+    background: rgba(220, 120, 0, 1);
+    transform: translateY(-2px);
+}
+
+.settings-close-btn {
+    background: rgba(100, 100, 100, 0.8);
+    color: white;
+}
+
+.settings-close-btn:hover {
+    background: rgba(120, 120, 120, 1);
+    transform: translateY(-2px);
+}
+
+.settings-hint {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    text-align: center;
+    margin-top: 10px;
 }
 
 /* 响应式设计 */

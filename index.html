@@ -8,6 +8,24 @@
 </head>
 <body>
     <div class="chat-container">
+        <!-- 设置按钮 -->
+        <button id="settingsBtn" class="settings-btn" title="API 设置">⚙️</button>
+
+        <!-- 设置面板 -->
+        <div id="settingsPanel" class="settings-panel hidden">
+            <div class="settings-content">
+                <h3>API 设置</h3>
+                <label for="apiKeyInput">DeepSeek API Key:</label>
+                <input type="password" id="apiKeyInput" placeholder="输入你的 API Key" class="api-key-input">
+                <div class="settings-buttons">
+                    <button id="saveApiBtn" class="settings-save-btn">保存</button>
+                    <button id="clearApiBtn" class="settings-clear-btn">清除</button>
+                    <button id="closeSettingsBtn" class="settings-close-btn">关闭</button>
+                </div>
+                <p class="settings-hint">API Key 将被保存在浏览器本地, 不会上传到服务器。</p>
+            </div>
+        </div>
+
         <!-- 对话框 -->
         <div class="chat-box">
             <div class="messages" id="messagesContainer">

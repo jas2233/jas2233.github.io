@@ -1,12 +1,22 @@
-// 获取DOM元素
+// DOM 元素
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const messagesContainer = document.getElementById('messagesContainer');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsPanel = document.getElementById('settingsPanel');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const saveApiBtn = document.getElementById('saveApiBtn');
+const clearApiBtn = document.getElementById('clearApiBtn');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
 
-// AI的回复（目前固定）
-const AI_RESPONSE = '这里是灰鸦小队队长，露西亚。';
+// DeepSeek API 配置
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
+const MODEL = 'deepseek-chat';
 
-// 获取当前时间戳
+// 存储对话历史
+let conversationHistory = [];
+
+// 获取时间戳
 function getTimestamp() {
     const now = new Date();
     let hours = now.getHours();
@@ -19,6 +29,61 @@ function getTimestamp() {
     
     return `${hours}:${minutes} ${period}`;
 }
+
+// 从 localStorage 获取 API Key
+function getApiKey() {
+    return localStorage.getItem('deepseek_api_key') || '';
+}
+
+// 保存 API Key 到 localStorage
+function saveApiKey(apiKey) {
+    localStorage.setItem('deepseek_api_key', apiKey);
+}
+
+// 清除 API Key
+function clearApiKey() {
+    localStorage.removeItem('deepseek_api_key');
+    apiKeyInput.value = '';
+}
+
+// 打开设置面板
+settingsBtn.addEventListener('click', () => {
+    apiKeyInput.value = getApiKey();
+    settingsPanel.classList.remove('hidden');
+});
+
+// 关闭设置面板
+closeSettingsBtn.addEventListener('click', () => {
+    settingsPanel.classList.add('hidden');
+});
+
+// 保存 API Key
+saveApiBtn.addEventListener('click', () => {
+    const apiKey = apiKeyInput.value.trim();
+    if (!apiKey) {
+        alert('请输入 API Key');
+        return;
+    }
+    saveApiKey(apiKey);
+    alert('API Key 已保存！');
+    settingsPanel.classList.add('hidden');
+});
+
+// 清除 API Key
+clearApiBtn.addEventListener('click', () => {
+    if (confirm('确定要清除 API Key 吗？')) {
+        clearApiKey();
+        alert('API Key 已清除');
+        settingsPanel.classList.add('hidden');
+    }
+});
+
+// 点击面板外部关闭
+settingsPanel.addEventListener('click', (e) => {
+    if (e.target === settingsPanel) {
+        settingsPanel.classList.add('hidden');
+    }
+});
 
 // 添加消息到对话框
 function addMessage(text, isUser) {
@@ -45,6 +110,80 @@ function addMessage(text, isUser) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+// 调用 DeepSeek API
+async function callDeepSeekAPI(userMessage) {
+    const apiKey = getApiKey();
+    
+    if (!apiKey) {
+        addMessage('❌ 错误：请先设置 API Key。点击右上角的⚙️按钮进行设置。', false);
+        return null;
+    }
+
+    // 添加用户消息到历史记录
+    conversationHistory.push({
+        role: 'user',
+        content: userMessage
+    });
+
+    try {
+        addMessage('🤖 思考中...', false);
+        
+        const response = await fetch(DEEPSEEK_API_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: MODEL,
+                messages: [
+                    {
+                        role: 'system',
+                        content: '你是灰鸦小队队长露西亚。请以露西亚的身份与用户进行对话。'
+                    },
+                    ...conversationHistory
+                ],
+                temperature: 0.7,
+                max_tokens: 1000
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`API 错误: ${errorData.error?.message || response.statusText}`);
+        }
+
+        const data = await response.json();
+        const aiMessage = data.choices[0].message.content;
+
+        // 添加 AI 消息到历史记录
+        conversationHistory.push({
+            role: 'assistant',
+            content: aiMessage
+        });
+
+        // 移除思考提示,添加实际回复
+        const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
+        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
+            thinkingMessage.remove();
+        }
+
+        addMessage(aiMessage, false);
+        return aiMessage;
+    } catch (error) {
+        console.error('API 调用失败:', error);
+        
+        // 移除思考提示
+        const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
+        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
+            thinkingMessage.remove();
+        }
+
+        addMessage(`❌ 错误: ${error.message}`, false);
+        return null;
+    }
+}
+
 // 自动调整输入框高度
 function autoResizeTextarea() {
     messageInput.style.height = 'auto';
@@ -52,10 +191,13 @@ function autoResizeTextarea() {
 }
 
 // 发送消息
-function sendMessage() {
+async function sendMessage() {
     const message = messageInput.value.trim();
     
     if (!message) return;
+    
+    // 禁用发送按钮
+    sendBtn.disabled = true;
     
     // 添加用户消息
     addMessage(message, true);
@@ -65,10 +207,11 @@ function sendMessage() {
     messageInput.style.height = 'auto';
     messageInput.focus();
     
-    // 模拟API延迟，然后添加AI回复
-    setTimeout(() => {
-        addMessage(AI_RESPONSE, false);
-    }, 500);
+    // 调用 API
+    await callDeepSeekAPI(message);
+    
+    // 启用发送按钮
+    sendBtn.disabled = false;
 }
 
 // 发送按钮点击事件
@@ -83,7 +226,9 @@ messageInput.addEventListener('keydown', (e) => {
         } else {
             // Enter 发送
             e.preventDefault();
-            sendMessage();
+            if (!sendBtn.disabled) {
+                sendMessage();
+            }
         }
     }
 });
