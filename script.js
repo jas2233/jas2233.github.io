@@ -109,12 +109,7 @@ function addMessage(text, isUser) {
     const textP = document.createElement('p');
     textP.textContent = text;
     
-    const timestampSpan = document.createElement('span');
-    timestampSpan.className = 'timestamp';
-    timestampSpan.textContent = getTimestamp();
-    
     bubbleDiv.appendChild(textP);
-    bubbleDiv.appendChild(timestampSpan);
     
     messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubbleDiv);
