@@ -94,10 +94,12 @@ function addMessage(text, isUser) {
     const avatar = document.createElement('img');
     avatar.className = `avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
     if (isUser) {
-        avatar.src = '屏幕截图_18-2-2026_151930_pns.kurogames.com.jpeg';
-        avatar.alt = '你';
-    } else {
+        // 用户消息 - 指挥官头像
         avatar.src = '300px-人物_灰鸦指挥官1.png';
+        avatar.alt = '指挥官';
+    } else {
+        // AI消息 - 露西亚头像
+        avatar.src = '屏幕截图_18-2-2026_151930_pns.kurogames.com.jpeg';
         avatar.alt = '露西亚';
     }
     
