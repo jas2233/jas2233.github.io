@@ -90,6 +90,17 @@ function addMessage(text, isUser) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
     
+    // 添加头像
+    const avatar = document.createElement('img');
+    avatar.className = `avatar ${isUser ? 'user-avatar' : 'ai-avatar'}`;
+    if (isUser) {
+        avatar.src = '屏幕截图_18-2-2026_151930_pns.kurogames.com.jpeg';
+        avatar.alt = '你';
+    } else {
+        avatar.src = '300px-人物_灰鸦指挥官1.png';
+        avatar.alt = '露西亚';
+    }
+    
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
     
@@ -102,6 +113,8 @@ function addMessage(text, isUser) {
     
     bubbleDiv.appendChild(textP);
     bubbleDiv.appendChild(timestampSpan);
+    
+    messageDiv.appendChild(avatar);
     messageDiv.appendChild(bubbleDiv);
     
     messagesContainer.appendChild(messageDiv);
