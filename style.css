@@ -101,8 +101,8 @@ body {
 
 /* 头像样式 */
 .avatar {
-    width: 150px;
-    height: 150px;
+    width: 60px;
+    height: 60px;
     border-radius: 12px;
     object-fit: cover;
     flex-shrink: 0;
@@ -373,8 +373,8 @@ body {
     }
 
     .avatar {
-        width: 60px;
-        height: 60px;
+        width: 40px;
+        height: 40px;
     }
 
     .message-bubble {
