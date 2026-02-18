@@ -39,13 +39,13 @@ body {
 /* 对话框样式 */
 .chat-box {
     flex: 1;
-    background: rgba(0, 0, 0, 0.05);
+    background: transparent;
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 15px;
     overflow-y: auto;
     border: 2px solid rgba(100, 100, 150, 0.5);
-    backdrop-filter: blur(2px);
+    backdrop-filter: none;
 }
 
 .chat-box::-webkit-scrollbar {
@@ -137,14 +137,14 @@ body {
     display: flex;
     gap: 10px;
     padding: 15px;
-    background: rgba(0, 0, 0, 0.08);
+    background: transparent;
     border-radius: 12px;
     border: 2px solid rgba(100, 100, 150, 0.5);
 }
 
 .message-input {
     flex: 1;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 10px;
     color: #ffffff;
