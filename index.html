@@ -42,9 +42,24 @@
         <div class="input-area">
             <textarea id="messageInput" class="message-input" placeholder="输入消息... (Shift + Enter 换行)" rows="1"></textarea>
             <button id="sendBtn" class="send-button">发送</button>
+            <!-- 背景选择按钮 -->
+            <button id="bgBtn" class="background-btn" title="更换背景">🖼️</button>
         </div>
     </div>
 
-    <script src="script.js?v=8"></script>
+    <!-- 背景选择模态框 -->
+    <div id="bgModal" class="bg-modal hidden">
+        <div class="bg-modal-content">
+            <div class="bg-modal-header">
+                <h3>选择背景</h3>
+                <button id="closeBgModal" class="bg-modal-close">✕</button>
+            </div>
+            <div class="bg-grid" id="bgGrid">
+                <!-- 背景图片将动态插入这里 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=9"></script>
 </body>
 </html>

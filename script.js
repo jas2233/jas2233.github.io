@@ -9,10 +9,29 @@ const apiKeyInput = document.getElementById('apiKeyInput');
 const saveApiBtn = document.getElementById('saveApiBtn');
 const clearApiBtn = document.getElementById('clearApiBtn');
 const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const bgBtn = document.getElementById('bgBtn');
+const bgModal = document.getElementById('bgModal');
+const bgGrid = document.getElementById('bgGrid');
+const closeBgModal = document.getElementById('closeBgModal');
 
 // DeepSeek API 配置
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const MODEL = 'deepseek-chat';
+
+// 背景图片列表
+const BACKGROUNDS = [
+    { id: 1, name: '火焰004', path: 'picture/lucia_flame004.jpg' },
+    { id: 2, name: '昏沙001', path: 'picture/lucia_hunsha001.jpg' },
+    { id: 3, name: '昏沙003', path: 'picture/lucia_hunsha003.png' },
+    { id: 4, name: '灰鸦001', path: 'picture/lucia_raven001.png' },
+    { id: 5, name: '灰鸦002', path: 'picture/lucia_raven002.png' },
+    { id: 6, name: '灰鸦003', path: 'picture/lucia_raven003.jpg' },
+    { id: 7, name: '灰鸦004', path: 'picture/lucia_raven004.png' },
+    { id: 8, name: '火焰001', path: 'picture/luciaflame001.jpg' },
+    { id: 9, name: '火焰002', path: 'picture/luciaflame002.png' },
+    { id: 10, name: '火焰003', path: 'picture/luciaflame003.png' },
+    { id: 11, name: '昏沙002', path: 'picture/luciahunsha002.jpg' }
+];
 
 // 存储对话历史
 let conversationHistory = [];
@@ -57,6 +76,23 @@ function renderConversation() {
     conversationHistory.forEach(msg => {
         addMessage(msg.content, msg.role === 'user');
     });
+}
+
+// ===== 背景管理函数 =====
+function getSelectedBackground() {
+    return localStorage.getItem('selected_background') || BACKGROUNDS[0].path;
+}
+
+function saveBackgroundChoice(backgroundPath) {
+    localStorage.setItem('selected_background', backgroundPath);
+}
+
+function applyBackground(backgroundPath) {
+    document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${backgroundPath}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+    saveBackgroundChoice(backgroundPath);
 }
 
 // 获取时间戳
@@ -125,6 +161,63 @@ clearApiBtn.addEventListener('click', () => {
 settingsPanel.addEventListener('click', (e) => {
     if (e.target === settingsPanel) {
         settingsPanel.classList.add('hidden');
+    }
+});
+
+// ===== 背景选择事件处理 =====
+// 初始化背景网格
+function initBackgroundGrid() {
+    bgGrid.innerHTML = '';
+    const selectedBg = getSelectedBackground();
+    
+    BACKGROUNDS.forEach(bg => {
+        const bgItem = document.createElement('div');
+        bgItem.className = 'bg-item';
+        bgItem.style.backgroundImage = `url('${bg.path}')`;
+        
+        const label = document.createElement('div');
+        label.className = 'bg-item-label';
+        label.textContent = bg.name;
+        
+        bgItem.appendChild(label);
+        
+        // 标记当前选中的背景
+        if (bg.path === selectedBg) {
+            bgItem.classList.add('selected');
+        }
+        
+        bgItem.addEventListener('click', () => {
+            // 移除其他项的selected类
+            document.querySelectorAll('.bg-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            // 添加selected类到当前项
+            bgItem.classList.add('selected');
+            // 应用背景
+            applyBackground(bg.path);
+            // 关闭模态框
+            bgModal.classList.add('hidden');
+        });
+        
+        bgGrid.appendChild(bgItem);
+    });
+}
+
+// 打开背景选择按钮
+bgBtn.addEventListener('click', () => {
+    initBackgroundGrid();
+    bgModal.classList.remove('hidden');
+});
+
+// 关闭背景选择模态框
+closeBgModal.addEventListener('click', () => {
+    bgModal.classList.add('hidden');
+});
+
+// 点击模态框外部关闭
+bgModal.addEventListener('click', (e) => {
+    if (e.target === bgModal) {
+        bgModal.classList.add('hidden');
     }
 });
 
@@ -330,3 +423,6 @@ messageInput.focus();
 // 页面加载时读取并渲染历史（在 focus 之后执行以保持输入焦点）
 loadConversation();
 renderConversation();
+
+// 页面加载时应用保存的背景
+applyBackground(getSelectedBackground());

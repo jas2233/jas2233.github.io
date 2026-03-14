@@ -365,7 +365,167 @@ body {
     margin-top: 10px;
 }
 
+/* ===== 背景选择器样式 ===== */
+
+/* 背景选择按钮 */
+.background-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 50px;
+    height: 50px;
+    background: rgba(100, 150, 255, 0.8);
+    border: 2px solid rgba(100, 200, 255, 0.6);
+    border-radius: 50%;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.background-btn:hover {
+    background: rgba(100, 180, 255, 0.95);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+}
+
+/* 背景选择模态框 */
+.bg-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.bg-modal.hidden {
+    display: none;
+}
+
+.bg-modal-content {
+    background: rgba(20, 20, 40, 0.98);
+    border-radius: 15px;
+    padding: 25px;
+    max-width: 900px;
+    width: 95%;
+    max-height: 85vh;
+    border: 2px solid rgba(100, 150, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.bg-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(100, 150, 255, 0.3);
+    padding-bottom: 15px;
+}
+
+.bg-modal-header h3 {
+    color: #00aaff;
+    font-size: 20px;
+    margin: 0;
+}
+
+.bg-modal-close {
+    background: none;
+    border: none;
+    color: #00aaff;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bg-modal-close:hover {
+    color: #ffffff;
+    transform: scale(1.2);
+}
+
+/* 背景网格 */
+.bg-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* 背景网格项 */
+.bg-item {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid rgba(100, 150, 255, 0.3);
+    transition: all 0.25s ease;
+    background-size: cover;
+    background-position: center;
+}
+
+.bg-item:hover {
+    transform: scale(1.05);
+    border-color: rgba(100, 200, 255, 0.8);
+    box-shadow: 0 0 15px rgba(100, 200, 255, 0.4);
+}
+
+.bg-item.selected {
+    border-color: rgba(100, 255, 100, 0.8);
+    box-shadow: 0 0 20px rgba(100, 255, 100, 0.5);
+}
+
+.bg-item-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    padding: 8px;
+    font-size: 14px;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.bg-item:hover .bg-item-label {
+    background: rgba(0, 0, 0, 0.9);
+}
+
 /* 响应式设计 */
+@media (max-width: 600px) {
+    .bg-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .bg-modal-content {
+        max-height: 90vh;
+        padding: 15px;
+    }
+
+    .background-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        bottom: 80px;
+        left: 15px;
+    }
+}
+
+/* 原有响应式设计 */
 @media (max-width: 600px) {
     .chat-container {
         max-width: 100%;
