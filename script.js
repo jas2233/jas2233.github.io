@@ -15,6 +15,48 @@ const MODEL = 'deepseek-chat';
 
 // 存储对话历史
 let conversationHistory = [];
+// 本地存储消息上限，防止无限增长
+const MAX_CONVERSATION_MESSAGES = 200;
+
+// 保存会话到 localStorage
+function saveConversation() {
+    try {
+        localStorage.setItem('conversation_history', JSON.stringify(conversationHistory));
+    } catch (e) {
+        console.error('保存会话失败:', e);
+    }
+}
+
+// 从 localStorage 读取会话
+function loadConversation() {
+    const raw = localStorage.getItem('conversation_history');
+    if (raw) {
+        try {
+            conversationHistory = JSON.parse(raw) || [];
+        } catch (e) {
+            console.error('解析会话历史失败:', e);
+            conversationHistory = [];
+        }
+    } else {
+        conversationHistory = [];
+    }
+}
+
+// 根据 conversationHistory 渲染到页面（不会二次保存）
+function renderConversation() {
+    messagesContainer.innerHTML = '';
+    // 如果没有历史，则保留默认的欢迎消息不替换
+    if (!conversationHistory || conversationHistory.length === 0) {
+        // 保留初始页面中可能存在的默认 AI 欢迎信息
+        const initial = document.querySelector('.message.ai-message');
+        if (initial) messagesContainer.appendChild(initial);
+        return;
+    }
+
+    conversationHistory.forEach(msg => {
+        addMessage(msg.content, msg.role === 'user');
+    });
+}
 
 // 获取时间戳
 function getTimestamp() {
@@ -129,11 +171,11 @@ async function callDeepSeekAPI(userMessage) {
         return null;
     }
 
-    // 添加用户消息到历史记录
-    conversationHistory.push({
-        role: 'user',
-        content: userMessage
-    });
+    // 添加用户消息到历史记录并保存
+    conversationHistory.push({ role: 'user', content: userMessage });
+    // 控制历史长度
+    if (conversationHistory.length > MAX_CONVERSATION_MESSAGES) conversationHistory.shift();
+    saveConversation();
 
     try {
         addMessage('🤖 思考中...', false);
@@ -166,11 +208,10 @@ async function callDeepSeekAPI(userMessage) {
         const data = await response.json();
         const aiMessage = data.choices[0].message.content;
 
-        // 添加 AI 消息到历史记录
-        conversationHistory.push({
-            role: 'assistant',
-            content: aiMessage
-        });
+        // 添加 AI 消息到历史记录并保存
+        conversationHistory.push({ role: 'assistant', content: aiMessage });
+        if (conversationHistory.length > MAX_CONVERSATION_MESSAGES) conversationHistory.shift();
+        saveConversation();
 
         // 移除思考提示,添加实际回复
         const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
@@ -248,3 +289,7 @@ messageInput.addEventListener('input', autoResizeTextarea);
 
 // 初始化焦点
 messageInput.focus();
+
+// 页面加载时读取并渲染历史（在 focus 之后执行以保持输入焦点）
+loadConversation();
+renderConversation();
