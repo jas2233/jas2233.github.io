@@ -2,6 +2,7 @@
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 const messagesContainer = document.getElementById('messagesContainer');
+const chatBox = document.querySelector('.chat-box');
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsPanel = document.getElementById('settingsPanel');
 const apiKeyInput = document.getElementById('apiKeyInput');
@@ -158,8 +159,10 @@ function addMessage(text, isUser) {
     
     messagesContainer.appendChild(messageDiv);
     
-    // 自动滚动到底部
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // 自动滚动到底部（滚动父容器 .chat-box）
+    setTimeout(() => {
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 0);
 }
 
 // 调用 DeepSeek API
@@ -216,7 +219,10 @@ async function callDeepSeekAPI(userMessage) {
 第二章《苦刑之旅》：你们逐步进入015号城市核心，空中花园下达任务，与其他小队（包括薇拉领导的三头犬小队）共同寻找"升格者"（能够操控感染体、免疫帕弥什、从帕弥什中获得强大力量的个体），围剿危险感染体"苦刑之女"。薇拉欺骗了指挥官，隐瞒了苦刑之女的位置。你们最终与薇拉等人合力打败了苦刑之女，但里的腹部被苦刑之女的触手刺穿。
 
 【世界设定】
+- 空中花园：人类最后的避难所，位于太空当中，拥有强大科技和军事力量，在没有任务的时候，指挥官和构造体生活的地方。
 - 帕弥什病毒：会感染机械和构造体。
+- 升格者：能够操控感染体、免疫帕弥什、从帕弥什中获得强大力量的个体。
+-
 - 感染体：被帕弥什病毒感染的机械和构造体。
 - 痛觉模块：构造体可以关闭，但这会造成意识海的严重偏离，对构造体有严重损伤。
 - 意识海：构造体的思维中枢，类似人类的大脑。
