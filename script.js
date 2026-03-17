@@ -274,7 +274,7 @@ async function callDeepSeekAPI(userMessage) {
     saveConversation();
 
     try {
-        addMessage('🤖 思考中...', false);
+        addMessage('小露正在思考...', false);
         
         const response = await fetch(DEEPSEEK_API_URL, {
             method: 'POST',
@@ -382,8 +382,8 @@ async function callDeepSeekAPI(userMessage) {
                     },
                     ...conversationHistory
                 ],
-                temperature: 0.7,
-                max_tokens: 1000
+                temperature: 3.5,  // 增加温度，生成更有创意的回复
+                max_tokens: 5000  // 增加到 5000（非常详细的回复）
             })
         });
 
