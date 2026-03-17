@@ -95,19 +95,7 @@ function applyBackground(backgroundPath) {
     saveBackgroundChoice(backgroundPath);
 }
 
-// 获取时间戳
-function getTimestamp() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    const period = hours >= 12 ? 'PM' : 'AM';
-    
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    
-    return `${hours}:${minutes} ${period}`;
-}
+
 
 // 从 localStorage 获取 API Key
 function getApiKey() {
@@ -382,7 +370,7 @@ async function callDeepSeekAPI(userMessage) {
                     },
                     ...conversationHistory
                 ],
-                temperature: 3.5,  // 增加温度，生成更有创意的回复
+                temperature: 2.0,  // 增加温度，生成更有创意的回复
                 max_tokens: 5000  // 增加到 5000（非常详细的回复）
             })
         });
