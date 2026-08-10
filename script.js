@@ -370,7 +370,7 @@ async function callDeepSeekAPI(userMessage) {
                     },
                     ...conversationHistory
                 ],
-                temperature: 2.0,  // 增加温度，生成更有创意的回复
+                temperature: 1.0,  // 平衡回复的稳定性和创造性
                 max_tokens: 5000  // 增加到 5000（非常详细的回复）
             })
         });
@@ -390,7 +390,7 @@ async function callDeepSeekAPI(userMessage) {
 
         // 移除思考提示,添加实际回复
         const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
-        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
+        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('小露正在思考...')) {
             thinkingMessage.remove();
         }
 
@@ -401,7 +401,7 @@ async function callDeepSeekAPI(userMessage) {
         
         // 移除思考提示
         const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
-        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
+        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('小露正在思考...')) {
             thinkingMessage.remove();
         }
 
