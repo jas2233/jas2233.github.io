@@ -619,8 +619,22 @@ onBeforeUnmount(() => {
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M4 9V5h4M16 5h4v4M20 15v4h-4M8 19H4v-4M8 12h8" />
                     </svg>
-                    <span class="panorama-label">全景模式</span>
+                    <span class="panorama-label">全景</span>
                     <span class="panorama-state">{{ isPanorama ? 'ON' : 'OFF' }}</span>
+                </button>
+                <button
+                    ref="backgroundButton"
+                    type="button"
+                    class="icon-button header-background-button"
+                    title="更换背景"
+                    aria-label="选择聊天背景"
+                    @click="openBackgrounds"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="16" rx="2" />
+                        <circle cx="8.5" cy="9" r="1.5" />
+                        <path d="m21 15-5-5L5 20" />
+                    </svg>
                 </button>
             </div>
         </header>
@@ -646,7 +660,18 @@ onBeforeUnmount(() => {
 
         <div class="input-area">
             <div class="composer-field">
-                <span class="command-prefix" aria-hidden="true">MSG</span>
+                                <button
+                    type="button"
+                    class="command-prefix memory-command"
+                    :class="{ active: useLongTermRecall }"
+                    :aria-pressed="useLongTermRecall"
+                    :disabled="isSending || isConversationLoading || !activeConversationId"
+                    title="联想长期记忆"
+                    @click="useLongTermRecall = !useLongTermRecall"
+                >
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 16Z" /></svg>
+                    <span>联想</span>
+                </button>
                 <textarea
                     ref="messageInput"
                     v-model="draft"
@@ -659,32 +684,6 @@ onBeforeUnmount(() => {
                     @keydown="handleComposerKeydown"
                 />
             </div>
-            <button
-                ref="backgroundButton"
-                type="button"
-                class="icon-button background-btn"
-                title="更换背景"
-                aria-label="选择聊天背景"
-                @click="openBackgrounds"
-            >
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="16" rx="2" />
-                    <circle cx="8.5" cy="9" r="1.5" />
-                    <path d="m21 15-5-5L5 20" />
-                </svg>
-            </button>
-            <button
-                type="button"
-                class="memory-toggle"
-                :class="{ active: useLongTermRecall }"
-                :aria-pressed="useLongTermRecall"
-                :disabled="isSending || isConversationLoading || !activeConversationId"
-                title="联想长期记忆"
-                @click="useLongTermRecall = !useLongTermRecall"
-            >
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" /></svg>
-                <span>联想</span>
-            </button>
             <button
                 type="button"
                 class="send-button"
