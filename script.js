@@ -16,27 +16,30 @@ const closeBgModal = document.getElementById('closeBgModal');
 
 // DeepSeek API 配置
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-const MODEL = 'deepseek-chat';
+const MODEL = 'deepseek-v4-flash';
 
 // 背景图片列表
 const BACKGROUNDS = [
-    { id: 1, name: '火焰004', path: 'picture/lucia_flame004.jpg' },
-    { id: 2, name: '昏沙001', path: 'picture/lucia_hunsha001.jpg' },
-    { id: 3, name: '昏沙003', path: 'picture/lucia_hunsha003.png' },
+    { id: 1, name: '誓焰004', path: 'picture/lucia_flame004.jpg' },
+    { id: 2, name: '婚纱001', path: 'picture/lucia_hunsha001.jpg' },
+    { id: 3, name: '婚纱003', path: 'picture/lucia_hunsha003.png' },
     { id: 4, name: '灰鸦001', path: 'picture/lucia_raven001.png' },
     { id: 5, name: '灰鸦002', path: 'picture/lucia_raven002.png' },
     { id: 6, name: '灰鸦003', path: 'picture/lucia_raven003.jpg' },
     { id: 7, name: '灰鸦004', path: 'picture/lucia_raven004.png' },
-    { id: 8, name: '火焰001', path: 'picture/luciaflame001.jpg' },
-    { id: 9, name: '火焰002', path: 'picture/luciaflame002.png' },
-    { id: 10, name: '火焰003', path: 'picture/luciaflame003.png' },
-    { id: 11, name: '昏沙002', path: 'picture/luciahunsha002.jpg' }
+    { id: 8, name: '誓焰001', path: 'picture/luciaflame001.jpg' },
+    { id: 9, name: '誓焰002', path: 'picture/luciaflame002.png' },
+    { id: 10, name: '誓焰003', path: 'picture/luciaflame003.png' },
+    { id: 11, name: '婚纱002', path: 'picture/luciahunsha002.jpg' }
 ];
 
 // 存储对话历史
 let conversationHistory = [];
 // 本地存储消息上限，防止无限增长
 const MAX_CONVERSATION_MESSAGES = 200;
+// 每次只发送最近的对话，并排除异常长的 AI 回复，避免上下文失控
+const MAX_CONTEXT_MESSAGES = 20;
+const MAX_ASSISTANT_CONTEXT_CHARS = 2000;
 
 // 保存会话到 localStorage
 function saveConversation() {
@@ -64,15 +67,12 @@ function loadConversation() {
 
 // 根据 conversationHistory 渲染到页面（不会二次保存）
 function renderConversation() {
-    messagesContainer.innerHTML = '';
-    // 如果没有历史，则保留默认的欢迎消息不替换
+    // 如果没有历史，保留 HTML 中的默认欢迎消息
     if (!conversationHistory || conversationHistory.length === 0) {
-        // 保留初始页面中可能存在的默认 AI 欢迎信息
-        const initial = document.querySelector('.message.ai-message');
-        if (initial) messagesContainer.appendChild(initial);
         return;
     }
 
+    messagesContainer.innerHTML = '';
     conversationHistory.forEach(msg => {
         addMessage(msg.content, msg.role === 'user');
     });
@@ -88,7 +88,7 @@ function saveBackgroundChoice(backgroundPath) {
 }
 
 function applyBackground(backgroundPath) {
-    document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${backgroundPath}')`;
+    document.body.style.backgroundImage = `linear-gradient(135deg, rgba(3, 7, 18, 0.72), rgba(3, 7, 18, 0.38)), url('${backgroundPath}')`;
     document.body.style.backgroundSize = 'cover';
     document.body.style.backgroundPosition = 'center';
     document.body.style.backgroundAttachment = 'fixed';
@@ -113,15 +113,26 @@ function clearApiKey() {
     apiKeyInput.value = '';
 }
 
+function closeSettingsPanel() {
+    settingsPanel.classList.add('hidden');
+    settingsBtn.focus();
+}
+
+function closeBackgroundModal() {
+    bgModal.classList.add('hidden');
+    bgBtn.focus();
+}
+
 // 打开设置面板
 settingsBtn.addEventListener('click', () => {
     apiKeyInput.value = getApiKey();
     settingsPanel.classList.remove('hidden');
+    apiKeyInput.focus();
 });
 
 // 关闭设置面板
 closeSettingsBtn.addEventListener('click', () => {
-    settingsPanel.classList.add('hidden');
+    closeSettingsPanel();
 });
 
 // 保存 API Key
@@ -133,7 +144,7 @@ saveApiBtn.addEventListener('click', () => {
     }
     saveApiKey(apiKey);
     alert('API Key 已保存！');
-    settingsPanel.classList.add('hidden');
+    closeSettingsPanel();
 });
 
 // 清除 API Key
@@ -141,14 +152,14 @@ clearApiBtn.addEventListener('click', () => {
     if (confirm('确定要清除 API Key 吗？')) {
         clearApiKey();
         alert('API Key 已清除');
-        settingsPanel.classList.add('hidden');
+        closeSettingsPanel();
     }
 });
 
 // 点击面板外部关闭
 settingsPanel.addEventListener('click', (e) => {
     if (e.target === settingsPanel) {
-        settingsPanel.classList.add('hidden');
+        closeSettingsPanel();
     }
 });
 
@@ -159,11 +170,13 @@ function initBackgroundGrid() {
     const selectedBg = getSelectedBackground();
     
     BACKGROUNDS.forEach(bg => {
-        const bgItem = document.createElement('div');
+        const bgItem = document.createElement('button');
+        bgItem.type = 'button';
         bgItem.className = 'bg-item';
         bgItem.style.backgroundImage = `url('${bg.path}')`;
+        bgItem.setAttribute('aria-label', `使用${bg.name}背景`);
         
-        const label = document.createElement('div');
+        const label = document.createElement('span');
         label.className = 'bg-item-label';
         label.textContent = bg.name;
         
@@ -173,18 +186,21 @@ function initBackgroundGrid() {
         if (bg.path === selectedBg) {
             bgItem.classList.add('selected');
         }
+        bgItem.setAttribute('aria-pressed', bg.path === selectedBg ? 'true' : 'false');
         
         bgItem.addEventListener('click', () => {
             // 移除其他项的selected类
             document.querySelectorAll('.bg-item').forEach(item => {
                 item.classList.remove('selected');
+                item.setAttribute('aria-pressed', 'false');
             });
             // 添加selected类到当前项
             bgItem.classList.add('selected');
+            bgItem.setAttribute('aria-pressed', 'true');
             // 应用背景
             applyBackground(bg.path);
             // 关闭模态框
-            bgModal.classList.add('hidden');
+            closeBackgroundModal();
         });
         
         bgGrid.appendChild(bgItem);
@@ -195,17 +211,29 @@ function initBackgroundGrid() {
 bgBtn.addEventListener('click', () => {
     initBackgroundGrid();
     bgModal.classList.remove('hidden');
+    (bgGrid.querySelector('.selected') || closeBgModal).focus();
 });
 
 // 关闭背景选择模态框
 closeBgModal.addEventListener('click', () => {
-    bgModal.classList.add('hidden');
+    closeBackgroundModal();
 });
 
 // 点击模态框外部关闭
 bgModal.addEventListener('click', (e) => {
     if (e.target === bgModal) {
-        bgModal.classList.add('hidden');
+        closeBackgroundModal();
+    }
+});
+
+// 按 Escape 关闭当前弹窗
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+
+    if (!bgModal.classList.contains('hidden')) {
+        closeBackgroundModal();
+    } else if (!settingsPanel.classList.contains('hidden')) {
+        closeSettingsPanel();
     }
 });
 
@@ -229,10 +257,15 @@ function addMessage(text, isUser) {
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
+
+    const author = document.createElement('span');
+    author.className = 'message-author';
+    author.textContent = isUser ? '指挥官' : '露西亚';
     
     const textP = document.createElement('p');
     textP.textContent = text;
     
+    bubbleDiv.appendChild(author);
     bubbleDiv.appendChild(textP);
     
     messageDiv.appendChild(avatar);
@@ -244,6 +277,8 @@ function addMessage(text, isUser) {
     setTimeout(() => {
         chatBox.scrollTop = chatBox.scrollHeight;
     }, 0);
+
+    return messageDiv;
 }
 
 // 调用 DeepSeek API
@@ -261,8 +296,17 @@ async function callDeepSeekAPI(userMessage) {
     if (conversationHistory.length > MAX_CONVERSATION_MESSAGES) conversationHistory.shift();
     saveConversation();
 
+    let thinkingMessage;
+    let streamingMessage;
+
     try {
-        addMessage('小露正在思考...', false);
+        thinkingMessage = addMessage('正在整理思绪…', false);
+        thinkingMessage.classList.add('thinking-message');
+
+        const contextHistory = conversationHistory
+            .filter(msg => msg.role === 'user' ||
+                (msg.role === 'assistant' && msg.content?.length <= MAX_ASSISTANT_CONTEXT_CHARS))
+            .slice(-MAX_CONTEXT_MESSAGES);
         
         const response = await fetch(DEEPSEEK_API_URL, {
             method: 'POST',
@@ -272,6 +316,8 @@ async function callDeepSeekAPI(userMessage) {
             },
             body: JSON.stringify({
                 model: MODEL,
+                thinking: { type: 'disabled' },
+                stream: true,
                 messages: [
                     {
                         role: 'system',
@@ -368,10 +414,10 @@ async function callDeepSeekAPI(userMessage) {
 艰难撤离后，返回015号城市的隧道已被破坏，本应前来的运输机也已坠毁，这都是受到了罗兰的破坏。
 露西亚 拿上飞行员的吊牌，然后……继续前进吧。`
                     },
-                    ...conversationHistory
+                    ...contextHistory
                 ],
-                temperature: 2.0,  // 增加温度，生成更有创意的回复
-                max_tokens: 5000  // 增加到 5000（非常详细的回复）
+                temperature: 0.8,
+                max_tokens: 1200
             })
         });
 
@@ -380,29 +426,61 @@ async function callDeepSeekAPI(userMessage) {
             throw new Error(`API 错误: ${errorData.error?.message || response.statusText}`);
         }
 
-        const data = await response.json();
-        const aiMessage = data.choices[0].message.content;
+        if (!response.body) {
+            throw new Error('当前浏览器不支持流式响应');
+        }
+
+        thinkingMessage.remove();
+        thinkingMessage = null;
+
+        streamingMessage = addMessage('', false);
+        streamingMessage.classList.add('streaming-message');
+        const streamText = streamingMessage.querySelector('p');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let aiMessage = '';
+
+        const appendStreamLine = (line) => {
+            const content = parseSSELine(line);
+            if (!content) return;
+
+            aiMessage += content;
+            streamText.textContent = aiMessage;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split(/\r?\n/);
+            buffer = lines.pop() || '';
+            lines.forEach(appendStreamLine);
+        }
+
+        buffer += decoder.decode();
+        if (buffer) buffer.split(/\r?\n/).forEach(appendStreamLine);
+        if (!aiMessage.trim()) throw new Error('API 没有返回有效内容');
+
+        streamingMessage.classList.remove('streaming-message');
 
         // 添加 AI 消息到历史记录并保存
         conversationHistory.push({ role: 'assistant', content: aiMessage });
         if (conversationHistory.length > MAX_CONVERSATION_MESSAGES) conversationHistory.shift();
         saveConversation();
 
-        // 移除思考提示,添加实际回复
-        const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
-        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
-            thinkingMessage.remove();
-        }
-
-        addMessage(aiMessage, false);
         return aiMessage;
     } catch (error) {
         console.error('API 调用失败:', error);
         
         // 移除思考提示
-        const thinkingMessage = messagesContainer.querySelector('.message.ai-message:last-child');
-        if (thinkingMessage && thinkingMessage.querySelector('p').textContent.includes('🤖')) {
-            thinkingMessage.remove();
+        thinkingMessage?.remove();
+
+        if (streamingMessage) {
+            streamingMessage.classList.remove('streaming-message');
+            if (!streamingMessage.querySelector('p').textContent) streamingMessage.remove();
         }
 
         addMessage(`❌ 错误: ${error.message}`, false);
@@ -424,6 +502,7 @@ async function sendMessage() {
     
     // 禁用发送按钮
     sendBtn.disabled = true;
+    sendBtn.setAttribute('aria-busy', 'true');
     
     // 添加用户消息
     addMessage(message, true);
@@ -438,6 +517,7 @@ async function sendMessage() {
     
     // 启用发送按钮
     sendBtn.disabled = false;
+    sendBtn.removeAttribute('aria-busy');
 }
 
 // 发送按钮点击事件

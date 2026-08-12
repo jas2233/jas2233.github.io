@@ -4,7 +4,7 @@
 
 ## 📝 项目介绍
 
-这是一个使用 GitHub Pages 托管的网页应用，集成了 DeepSeek AI API，让你可以与露西亚进行自然对话。应用具有：
+这是一个使用 Vue 3 构建、通过 GitHub Pages 托管的网页应用，集成了 DeepSeek AI API，让你可以与露西亚进行自然对话。应用具有：
 
 - AI 对话：基于 DeepSeek API 的对话能力
 - 角色扮演：露西亚的完整人物设定与背景故事
@@ -18,7 +18,20 @@ https://jas2233.github.io/
 
 ## 🎮 使用方法
 
-1. 访问网站链接
+### 本地运行
+
+项目现在需要通过 Vite 启动，不能再直接双击 `index.html`。在项目目录打开终端后运行：
+
+```bash
+cmd /c npm install
+cmd /c npm run dev
+```
+
+终端会显示一个本地网址，通常是 `http://localhost:5173/`，按住 Ctrl 点击即可打开。
+
+### 开始聊天
+
+1. 打开本地网址或线上网站
 2. 点击右上角 ⚙️ 按钮打开设置面板
 3. 输入你的 DeepSeek API Key
 4. 在文本框输入消息，按 Enter 发送
@@ -31,38 +44,49 @@ https://jas2233.github.io/
 
 ## 📂 项目结构
 
-```
+```text
 Lucia.github.io/
-├── index.html          # 网页结构和 UI 元素
-├── style.css           # 样式表和视觉设计
-├── script.js           # 应用逻辑、API 交互
-├── picture/            # 背景图片目录
-└── README.md           # 项目文档
+├── src/
+│   ├── App.vue                  # 主界面和交互状态
+│   ├── components/ChatMessage.vue
+│   ├── data/lucia.js            # 露西亚角色设定
+│   └── services/                # DeepSeek、流式解析与本地存储
+├── picture/                     # 背景图片目录
+├── scripts/check-sse.mjs        # 流式解析检查
+├── index.html                   # Vue 入口
+├── style.css                    # 视觉设计
+├── package.json                 # 依赖和运行命令
+└── vite.config.js               # 构建配置
 ```
+
+根目录旧的 `script.js` 和 `stream-parser.js` 是迁移前备份，新版页面不会加载它们。
 
 ## 🔧 技术栈
 
-- **前端**：HTML5, CSS3, Vanilla JavaScript
+- **前端**：Vue 3、HTML5、CSS3、JavaScript
+- **构建工具**：Vite
 - **托管**：GitHub Pages
-- **API**：DeepSeek API (deepseek-chat)
+- **API**：DeepSeek API（deepseek-v4-flash，SSE 流式输出）
 - **存储**：浏览器 LocalStorage
 
 ## 🛠️ 自定义配置
 
 ### 添加新背景
 
-编辑 `script.js`，在 `BACKGROUNDS` 数组中添加新项：
+编辑 `src/App.vue`，在 `BACKGROUNDS` 数组中添加新项并导入图片：
 
 ```javascript
+import newBackground from '../picture/背景文件.jpg'
+
 const BACKGROUNDS = [
-    { id: 1, name: '背景名称', path: 'picture/背景文件.jpg' },
+    { id: 1, name: '背景名称', path: 'picture/背景文件.jpg', url: newBackground },
     // ... 更多背景
 ];
 ```
 
 ### 修改 AI 角色设定
 
-编辑 `script.js` 中的 `callDeepSeekAPI()` 函数，修改 `role: 'system'` 的内容来改变 AI 的行为和人格。
+编辑 `src/data/lucia.js` 可以修改露西亚的角色设定。
 
 ### 调整样式
 
@@ -80,7 +104,9 @@ const BACKGROUNDS = [
 - `selected_background`：当前选中的背景
 - `deepseek_api_key`：DeepSeek API Key（可随时清除）
 
-**隐私声明**：所有数据仅保存在你的浏览器本地，不会发送到任何第三方服务器。
+**隐私声明**：API Key 和对话记录保存在浏览器本地；发送消息时，API Key 和相关对话内容会发送给 DeepSeek API。
+
+所有本地读写集中在 `src/services/storage.js`，界面组件不再直接操作 LocalStorage。
 
 ## 🔐 API 密钥安全建议
 
@@ -91,7 +117,11 @@ const BACKGROUNDS = [
 
 ## 🚀 部署更新
 
-项目使用 GitHub Pages 自动部署：
+项目已经包含 GitHub Pages 自动部署流程。把代码推送到 `main` 分支后，GitHub Actions 会安装依赖、检查项目、构建 `dist` 并发布。
+
+第一次使用时，需要在 GitHub 仓库的 `Settings → Pages → Build and deployment` 中把来源选择为 `GitHub Actions`。
+
+如果项目目录中存在 `.git`，可以使用：
 
 ```bash
 git add .
@@ -99,27 +129,8 @@ git commit -m "描述你的更改"
 git push origin main
 ```
 
-更新会在几秒内自动生效。
+GitHub Pages 通常需要等待一小段时间才能显示更新。不要直接把未构建的 Vue 源码当作静态网页发布。
 
-## 📝 许可证
+如果目录中没有 `.git`，说明它可能是下载的 ZIP 副本，以上 Git 命令暂时不能使用。最简单的做法是重新从原 GitHub 仓库使用 `git clone` 下载；也可以在确认远程仓库地址后，再初始化 Git。
 
-请参考项目许可证信息。
-
-## 💡 添加功能建议
-
-- 添加更多项目
-- 添加博客部分
-- 集成联系表单
-- 添加深色主题切换
-- 优化 SEO
-
-## 📞 联系
-
-更新 `index.html` 中的联系方式部分，添加你的：
-- 电子邮件
-- GitHub 链接
-- LinkedIn、Twitter 等社交媒体
-
----
-
-设置完成！现在开始定制你的网站吧！
+当前项目没有附带 `LICENSE` 文件，因此 README 不再声明已有许可证。需要公开授权他人使用代码时，再选择合适的许可证并添加该文件。
