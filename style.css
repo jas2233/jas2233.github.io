@@ -715,9 +715,19 @@ button {
 }
 
 .memory-command.active {
-    color: #e0f2fe;
-    background: rgba(14, 165, 233, 0.16);
-    box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.08);
+    color: #f0f9ff;
+    background: rgba(14, 165, 233, 0.28);
+    border-right-color: rgba(125, 211, 252, 0.68);
+    box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.18), inset 0 0 14px rgba(56, 189, 248, 0.12);
+}
+
+.memory-command.active span {
+    color: #f0f9ff;
+    text-shadow: 0 0 8px rgba(125, 211, 252, 0.42);
+}
+
+.memory-command.active svg {
+    filter: drop-shadow(0 0 5px rgba(125, 211, 252, 0.48));
 }
 
 .memory-command:active:not(:disabled) {
@@ -1091,6 +1101,30 @@ button {
     font-size: 12px;
 }
 
+.conversation-rename {
+    width: 44px;
+    border: 0;
+    border-left: 1px solid var(--color-border);
+    color: var(--color-muted);
+    background: transparent;
+    cursor: pointer;
+}
+
+.conversation-rename:hover {
+    color: var(--color-accent);
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.conversation-rename svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .conversation-delete {
     width: 44px;
     border: 0;
@@ -1195,6 +1229,7 @@ button {
 .settings-save-btn:focus-visible,
 .bg-item:focus-visible,
 .conversation-main:focus-visible,
+.conversation-rename:focus-visible,
 .conversation-delete:focus-visible {
     outline: 3px solid rgba(56, 189, 248, 0.72);
     outline-offset: 3px;
