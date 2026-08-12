@@ -83,6 +83,9 @@ app.use((error, _request, response, _next) => {
     response.status(error.status || 500).json({ error: error.message || '服务器处理失败' })
 })
 
-app.listen(port, () => {
+export default app
+
+if (process.env.VERCEL !== '1')
+    app.listen(port, () => {
     console.log(`后端已启动：http://localhost:${port}`)
 })
