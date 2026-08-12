@@ -1,4 +1,5 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
+const defaultApiBaseUrl = import.meta.env.DEV ? 'http://localhost:3000' : ''
+export const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || defaultApiBaseUrl).replace(/\/$/, '')
 const TOKEN_KEY = 'lucia_access_token'
 
 export const getAccessToken = () => sessionStorage.getItem(TOKEN_KEY) || ''
