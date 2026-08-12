@@ -43,7 +43,7 @@ ALTER TABLE conversations ADD COLUMN IF NOT EXISTS mode_tag text;
 DROP INDEX IF EXISTS memories_fingerprint_idx;
 CREATE UNIQUE INDEX IF NOT EXISTS memories_scope_fingerprint_idx ON memories (scope_tag, fingerprint);
 CREATE INDEX IF NOT EXISTS memories_scope_tag_idx ON memories (scope_tag);
-UPDATE conversations SET title = '私密对话' WHERE title <> '私密对话';
+UPDATE conversations SET title = '私密对话' WHERE title IS NULL;
 
 DO $$
 BEGIN
@@ -173,7 +173,7 @@ AS $$
         SELECT
             c.id AS numeric_id,
             c.id::text AS id,
-            '私密对话'::text AS title,
+            c.title,
             c.created_at,
             c.updated_at,
             c.ended_at,
@@ -382,6 +382,47 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION lucia_rename_conversation(
+    p_conversation_id bigint,
+    p_title text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+    renamed conversations%ROWTYPE;
+    normalized_title text := trim(coalesce(p_title, ''));
+BEGIN
+    IF length(normalized_title) < 1 OR length(normalized_title) > 80 THEN
+        RAISE EXCEPTION 'invalid conversation title';
+    END IF;
+
+    UPDATE conversations
+    SET title = normalized_title,
+        updated_at = now()
+    WHERE id = p_conversation_id
+    RETURNING * INTO renamed;
+
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('status', 'not_found');
+    END IF;
+
+    RETURN jsonb_build_object(
+        'status', 'ok',
+        'conversation', jsonb_build_object(
+            'id', renamed.id::text,
+            'title', renamed.title,
+            'created_at', renamed.created_at,
+            'updated_at', renamed.updated_at,
+            'ended_at', renamed.ended_at,
+            'mode_tag', renamed.mode_tag
+        )
+    );
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION lucia_append_message(
     p_conversation_id bigint,
     p_role text,
@@ -433,8 +474,7 @@ BEGIN
     INTO saved_message;
 
     UPDATE conversations
-    SET title = '私密对话',
-        updated_at = now(),
+    SET updated_at = now(),
         ended_at = CASE WHEN p_role = 'user' THEN NULL ELSE ended_at END
     WHERE id = p_conversation_id;
 
