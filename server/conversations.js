@@ -19,6 +19,12 @@ function normalizeModeTag(value) {
     return typeof value === 'string' && value.length >= 20 && value.length <= 100 ? value : null
 }
 
+function normalizeConversationTitle(value) {
+    if (typeof value !== 'string') return null
+    const title = value.trim()
+    return title.length >= 1 && title.length <= 80 ? title : null
+}
+
 function normalizeLegacyMessages(messages) {
     if (!Array.isArray(messages)) return []
     return messages
@@ -105,6 +111,23 @@ export function createConversationStore(database) {
             if (!deleted) throw notFound()
         },
 
+        async rename(rawId, rawTitle) {
+            const id = normalizeConversationId(rawId)
+            const title = normalizeConversationTitle(rawTitle)
+            if (!id || !title) {
+                const error = new Error('对话名称需要 1 到 80 个字符')
+                error.status = 400
+                throw error
+            }
+            const result = await database.rpc('lucia_rename_conversation', {
+                p_conversation_id: id,
+                p_title: title
+            })
+            if (result?.status === 'not_found') throw notFound()
+            if (!result?.conversation) throw new Error('没有返回已重命名的对话')
+            return result.conversation
+        },
+
         async appendUserMessage(rawId, rawContent) {
             return appendMessage(rawId, rawContent, 'user')
         },
@@ -129,6 +152,9 @@ export function createConversationRouter(store) {
     router.post('/import', async (request, response) => {
         const conversation = await store.importLegacy(request.body?.messages, request.body?.modeTag)
         response.status(conversation ? 201 : 200).json({ conversation })
+    })
+    router.patch('/:id', async (request, response) => {
+        response.json({ conversation: await store.rename(request.params.id, request.body?.title) })
     })
     router.get('/:id/messages', async (request, response) => {
         response.json({ messages: await store.getMessages(request.params.id) })
