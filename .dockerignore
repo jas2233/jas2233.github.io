@@ -1,0 +1,12 @@
+.env
+.env.*
+.git
+.npm-cache
+node_modules
+dist
+picture
+scripts
+*.log
+*.png
+*.jpg
+*.jpeg

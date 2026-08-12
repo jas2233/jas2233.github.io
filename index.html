@@ -1,65 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a101e">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%230a101e%22/><path d=%22M19 17h8l5 9 5-9h8l-9 15 9 15h-8l-5-9-5 9h-8l9-15z%22 fill=%22%2338bdf8%22/></svg>">
     <title>露西亚 - 灰鸦小队</title>
-    <link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
-    <div class="chat-container">
-        <!-- 设置按钮 -->
-        <button id="settingsBtn" class="settings-btn" title="API 设置">⚙️</button>
-
-        <!-- 设置面板 -->
-        <div id="settingsPanel" class="settings-panel hidden">
-            <div class="settings-content">
-                <h3>API 设置</h3>
-                <label for="apiKeyInput">DeepSeek API Key:</label>
-                <input type="password" id="apiKeyInput" placeholder="输入你的 API Key" class="api-key-input">
-                <div class="settings-buttons">
-                    <button id="saveApiBtn" class="settings-save-btn">保存</button>
-                    <button id="clearApiBtn" class="settings-clear-btn">清除</button>
-                    <button id="closeSettingsBtn" class="settings-close-btn">关闭</button>
-                </div>
-                <p class="settings-hint">API Key 将被保存在浏览器本地, 不会上传到服务器。</p>
-            </div>
-        </div>
-
-        <!-- 对话框 -->
-        <div class="chat-box">
-            <div class="messages" id="messagesContainer">
-                <div class="message ai-message">
-                    <img src="屏幕截图_18-2-2026_151930_pns.kurogames.com.jpeg" alt="露西亚" class="avatar ai-avatar">
-                    <div class="message-bubble">
-                        <p>这里是灰鸦小队队长，露西亚。很高兴认识你。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 输入框 -->
-        <div class="input-area">
-            <textarea id="messageInput" class="message-input" placeholder="输入消息... (Shift + Enter 换行)" rows="1"></textarea>
-            <button id="sendBtn" class="send-button">发送</button>
-            <!-- 背景选择按钮 -->
-            <button id="bgBtn" class="background-btn" title="更换背景">🖼️</button>
-        </div>
-    </div>
-
-    <!-- 背景选择模态框 -->
-    <div id="bgModal" class="bg-modal hidden">
-        <div class="bg-modal-content">
-            <div class="bg-modal-header">
-                <h3>选择背景</h3>
-                <button id="closeBgModal" class="bg-modal-close">✕</button>
-            </div>
-            <div class="bg-grid" id="bgGrid">
-                <!-- 背景图片将动态插入这里 -->
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js?v=9"></script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>

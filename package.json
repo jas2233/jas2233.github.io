@@ -1,0 +1,35 @@
+{
+  "name": "lucia-chat",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "server": "node --env-file-if-exists=.env server/index.js",
+    "server:dev": "node --env-file-if-exists=.env --watch server/index.js",
+    "db:init": "node --env-file-if-exists=.env scripts/init-db.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "npm run check:sse && npm run check:storage && npm run check:auth && npm run check:crypto && npm run check:encrypted-storage && npm run check:chat && npm run check:memory && vite build",
+    "check:sse": "node scripts/check-sse.mjs",
+    "check:storage": "node scripts/check-storage.mjs",
+    "check:auth": "node scripts/check-auth.mjs",
+    "check:crypto": "node scripts/check-crypto.mjs",
+    "check:encrypted-storage": "node scripts/check-encrypted-storage.mjs",
+    "check:chat": "node scripts/check-chat.mjs",
+    "check:memory": "node scripts/check-memory.mjs",
+    "check:openrouter": "node --env-file-if-exists=.env scripts/check-openrouter-live.mjs",
+    "check:embedding": "node --env-file-if-exists=.env scripts/check-embedding-live.mjs",
+    "check:rag": "node --env-file-if-exists=.env scripts/check-rag-live.mjs",
+    "check:database": "node --env-file-if-exists=.env scripts/check-database.mjs",
+    "check:privacy": "node --env-file-if-exists=.env scripts/check-privacy-live.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "vue": "^3.5.41"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.8",
+    "vite": "^8.2.1"
+  }
+}
