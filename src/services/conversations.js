@@ -50,3 +50,10 @@ export async function appendConversationMessage(id, role, content) {
 export async function deleteConversation(id) {
     await request(`/api/conversations/${id}`, { method: 'DELETE' })
 }
+
+export async function renameConversation(id, title) {
+    return (await request(`/api/conversations/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ title })
+    })).conversation
+}
