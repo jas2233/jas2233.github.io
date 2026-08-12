@@ -373,6 +373,10 @@ button {
     transform: scale(0.96);
 }
 
+.header-background-button {
+    flex: 0 0 40px;
+}
+
 .chat-box {
     flex: 1;
     min-height: 0;
@@ -674,6 +678,53 @@ button {
 }
 
 .memory-toggle:disabled {
+    opacity: 0.48;
+    cursor: not-allowed;
+}
+
+.legacy-memory-toggle {
+    display: none;
+}
+
+.memory-command {
+    width: 76px;
+    flex: 0 0 76px;
+    gap: 5px;
+    padding: 0 8px;
+    color: var(--color-muted);
+    background: transparent;
+    border: 0;
+    border-right: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.memory-command svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.memory-command:hover:not(:disabled) {
+    color: var(--color-text);
+    background: rgba(148, 163, 184, 0.08);
+}
+
+.memory-command.active {
+    color: #e0f2fe;
+    background: rgba(14, 165, 233, 0.16);
+    box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.08);
+}
+
+.memory-command:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+.memory-command:disabled {
     opacity: 0.48;
     cursor: not-allowed;
 }
@@ -1090,7 +1141,7 @@ button {
 }
 
 .bg-item::after {
-    content: "✓";
+    content: "鉁?;
     position: absolute;
     top: 8px;
     right: 8px;
@@ -1138,6 +1189,7 @@ button {
 
 .icon-button:focus-visible,
 .memory-toggle:focus-visible,
+.memory-command:focus-visible,
 .panorama-button:focus-visible,
 .send-button:focus-visible,
 .settings-save-btn:focus-visible,
@@ -1353,3 +1405,4 @@ button {
         transition-duration: 1ms !important;
     }
 }
+
