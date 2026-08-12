@@ -8,7 +8,8 @@ import {
     deleteConversation,
     importLegacyConversation,
     listConversations,
-    loadConversationMessages
+    loadConversationMessages,
+    renameConversation
 } from './services/conversations.js'
 import { createVault, createVerifier, isEncrypted, verifyVault } from './services/crypto.js'
 import { streamDeepSeekReply } from './services/deepseek.js'
@@ -58,6 +59,18 @@ const BACKGROUNDS = [
     { id: 10, name: '誓焰003', path: 'picture/luciaflame003.png', url: flame003 },
     { id: 11, name: '婚纱002', path: 'picture/luciahunsha002.jpg', url: hunsha002 }
 ]
+const THINKING_MESSAGES = [
+    '正认真听着...',
+    '想给你个认真的答复…',
+    '在呢在呢...',
+    '让我组织一下...',
+    '露西亚歪了歪头...',
+    '唔…让我想想',
+    '抿了抿唇',
+    '正在整理思绪',
+    '让思绪落定…',
+    '露西亚指尖轻点…'
+]
 
 let nextMessageId = 0
 const createMessage = (role, content, extra = {}) => ({
@@ -101,6 +114,7 @@ const conversationButton = ref(null)
 const conversationModal = ref(null)
 let sendBurstTimer
 let linkProgressTimer
+let thinkingTimer
 let vault
 let modeTags
 
@@ -150,6 +164,23 @@ function stopLinkSync() {
     linkProgress.value = '100%'
 }
 
+function randomThinkingMessage() {
+    return THINKING_MESSAGES[Math.floor(Math.random() * THINKING_MESSAGES.length)]
+}
+
+function startThinkingMessage() {
+    const thinking = reactive(createMessage('assistant', randomThinkingMessage(), { thinking: true }))
+    thinkingTimer = window.setInterval(() => {
+        thinking.content = randomThinkingMessage()
+    }, 900)
+    return thinking
+}
+
+function stopThinkingMessage() {
+    window.clearInterval(thinkingTimer)
+    thinkingTimer = undefined
+}
+
 async function sendMessage() {
     const content = draft.value.trim()
     if (!content || isSending.value || !activeConversationId.value) return
@@ -167,7 +198,7 @@ async function sendMessage() {
     resizeComposer()
     messageInput.value?.focus()
 
-    const thinking = createMessage('assistant', '正在整理思绪…', { thinking: true })
+    const thinking = startThinkingMessage()
     messages.value.push(thinking)
     scrollToLatest()
 
@@ -210,6 +241,7 @@ async function sendMessage() {
             messages: history,
             memories: recalledMemories,
             onReady() {
+                stopThinkingMessage()
                 removeUiMessage(thinking.id)
                 streamingMessage = reactive(createMessage('assistant', '', { streaming: true }))
                 messages.value.push(streamingMessage)
@@ -243,6 +275,7 @@ async function sendMessage() {
         }
         messages.value.push(createMessage('assistant', `❌ 错误: ${error.message}`, { localOnly: true }))
     } finally {
+        stopThinkingMessage()
         isSending.value = false
         stopLinkSync()
         scrollToLatest()
@@ -418,6 +451,30 @@ function formatConversationTime(value) {
     return new Intl.DateTimeFormat('zh-CN', {
         month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'
     }).format(new Date(value))
+}
+
+function getConversationDisplayTitle(conversation) {
+    if (conversation.title && conversation.title !== '私密对话') return conversation.title
+    return conversation.mode === MODES.INTIMATE ? '亲密对话' : '日常对话'
+}
+
+async function renameConversationItem(conversation) {
+    if (isSending.value || isConversationLoading.value) return
+    const currentTitle = getConversationDisplayTitle(conversation)
+    const nextTitle = window.prompt('重命名对话', currentTitle)
+    if (nextTitle === null) return
+    const title = nextTitle.trim()
+    if (!title || title === currentTitle) return
+
+    try {
+        const renamed = await renameConversation(conversation.id, title)
+        const target = conversations.value.find(item => String(item.id) === String(conversation.id))
+        if (target) target.title = renamed?.title || title
+        conversations.value = [...conversations.value]
+    } catch (error) {
+        console.error('重命名对话失败:', error)
+        window.alert(error.message)
+    }
 }
 
 function handleComposerKeydown(event) {
@@ -752,7 +809,7 @@ onBeforeUnmount(() => {
                         @click="chooseConversation(conversation.id)"
                     >
                         <span class="conversation-title">
-                            {{ conversation.mode === MODES.INTIMATE ? '亲密对话' : '日常对话' }}
+                            {{ getConversationDisplayTitle(conversation) }}
                             <span class="conversation-mode" :class="`is-${conversation.mode}`">
                                 {{ conversation.mode === MODES.INTIMATE ? 'GEMINI' : 'DEEPSEEK' }}
                             </span>
@@ -763,8 +820,20 @@ onBeforeUnmount(() => {
                     </button>
                     <button
                         type="button"
+                        class="conversation-rename"
+                        :aria-label="`重命名对话：${getConversationDisplayTitle(conversation)}`"
+                        title="重命名对话"
+                        @click="renameConversationItem(conversation)"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m4 16-.8 4.8L8 20l11.5-11.5a2.1 2.1 0 0 0-3-3L5 17Z" />
+                            <path d="m14.5 7.5 2 2" />
+                        </svg>
+                    </button>
+                    <button
+                        type="button"
                         class="conversation-delete"
-                        :aria-label="`删除对话：${conversation.title}`"
+                        :aria-label="`删除对话：${getConversationDisplayTitle(conversation)}`"
                         title="删除对话"
                         @click="removeConversation(conversation.id)"
                     >
