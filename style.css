@@ -1141,7 +1141,7 @@ button {
 }
 
 .bg-item::after {
-    content: "鉁?;
+    content: "✓";
     position: absolute;
     top: 8px;
     right: 8px;
