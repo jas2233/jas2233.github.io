@@ -74,6 +74,7 @@ const conversations = ref([])
 const activeConversationId = ref('')
 const activeConversationMode = ref(MODES.DAILY)
 const draft = ref('')
+const useLongTermRecall = ref(false)
 const isSending = ref(false)
 const isSendBurst = ref(false)
 const linkProgress = ref('100%')
@@ -177,13 +178,16 @@ async function sendMessage() {
         const savedUserPromise = appendConversationMessage(
             activeConversationId.value, 'user', encryptedUser
         )
-        const recalledPromise = recallMemories(content, scopeTag)
+        const recalledPromise = useLongTermRecall.value
+            ? recallMemories(content, scopeTag)
             .then(items => Promise.all(items.map(item => vault.decrypt(item.content))))
             .catch(error => {
                 console.error('检索长期记忆失败:', error)
                 return []
             })
-        const rememberPromise = prepareMemories(content, activeConversationMode.value).then(async items => {
+            : Promise.resolve([])
+        const rememberPromise = useLongTermRecall.value
+            ? prepareMemories(content, activeConversationMode.value).then(async items => {
             const savedUser = await savedUserPromise
             const encrypted = await Promise.all(items.map(async item => ({
                 content: await vault.encrypt(item.content),
@@ -192,6 +196,8 @@ async function sendMessage() {
             })))
             if (encrypted.length) await saveMemories(savedUser.id, scopeTag, encrypted)
         }).catch(error => console.error('保存长期记忆失败:', error))
+
+            : Promise.resolve()
 
         const [, recalledMemories] = await Promise.all([
             savedUserPromise,
@@ -666,6 +672,18 @@ onBeforeUnmount(() => {
                     <circle cx="8.5" cy="9" r="1.5" />
                     <path d="m21 15-5-5L5 20" />
                 </svg>
+            </button>
+            <button
+                type="button"
+                class="memory-toggle"
+                :class="{ active: useLongTermRecall }"
+                :aria-pressed="useLongTermRecall"
+                :disabled="isSending || isConversationLoading || !activeConversationId"
+                title="联想长期记忆"
+                @click="useLongTermRecall = !useLongTermRecall"
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" /></svg>
+                <span>联想</span>
             </button>
             <button
                 type="button"
