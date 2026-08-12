@@ -173,10 +173,10 @@ async function sendMessage() {
     let streamingMessage
     try {
         const encryptedUser = await vault.encrypt(content)
-        const savedUser = await appendConversationMessage(
+        const scopeTag = modeTags[activeConversationMode.value]
+        const savedUserPromise = appendConversationMessage(
             activeConversationId.value, 'user', encryptedUser
         )
-        const scopeTag = modeTags[activeConversationMode.value]
         const recalledPromise = recallMemories(content, scopeTag)
             .then(items => Promise.all(items.map(item => vault.decrypt(item.content))))
             .catch(error => {
@@ -184,6 +184,7 @@ async function sendMessage() {
                 return []
             })
         const rememberPromise = prepareMemories(content, activeConversationMode.value).then(async items => {
+            const savedUser = await savedUserPromise
             const encrypted = await Promise.all(items.map(async item => ({
                 content: await vault.encrypt(item.content),
                 fingerprint: await vault.fingerprint(item.content),
@@ -192,11 +193,16 @@ async function sendMessage() {
             if (encrypted.length) await saveMemories(savedUser.id, scopeTag, encrypted)
         }).catch(error => console.error('保存长期记忆失败:', error))
 
+        const [, recalledMemories] = await Promise.all([
+            savedUserPromise,
+            recalledPromise
+        ])
+
         const reply = await streamDeepSeekReply({
             conversationId: activeConversationId.value,
             mode: activeConversationMode.value,
             messages: history,
-            memories: await recalledPromise,
+            memories: recalledMemories,
             onReady() {
                 removeUiMessage(thinking.id)
                 streamingMessage = reactive(createMessage('assistant', '', { streaming: true }))
