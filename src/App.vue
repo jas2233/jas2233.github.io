@@ -30,8 +30,8 @@ import {
     saveBackgroundPath
 } from './services/storage.js'
 
-import luciaAvatar from '../灞忓箷鎴浘_18-2-2026_151930_pns.kurogames.com.jpeg'
-import commanderAvatar from '../300px-浜虹墿_鐏伴甫鎸囨尌瀹?.png'
+import luciaAvatar from '../屏幕截图_18-2-2026_151930_pns.kurogames.com.jpeg'
+import commanderAvatar from '../300px-人物_灰鸦指挥官1.png'
 import flame004 from '../picture/lucia_flame004.jpg'
 import hunsha001 from '../picture/lucia_hunsha001.jpg'
 import hunsha003 from '../picture/lucia_hunsha003.png'
@@ -44,32 +44,32 @@ import flame002 from '../picture/luciaflame002.png'
 import flame003 from '../picture/luciaflame003.png'
 import hunsha002 from '../picture/luciahunsha002.jpg'
 
-const WELCOME_MESSAGE = '杩欓噷鏄伆楦﹀皬闃熼槦闀匡紝闇茶タ浜氥€傚緢楂樺叴璁よ瘑浣犮€?
+const WELCOME_MESSAGE = '这里是灰鸦小队队长，露西亚。很高兴认识你。'
 const MODES = { DAILY: 'daily', INTIMATE: 'intimate' }
 const BACKGROUNDS = [
-    { id: 1, name: '瑾撶劙004', path: 'picture/lucia_flame004.jpg', url: flame004 },
-    { id: 2, name: '濠氱罕001', path: 'picture/lucia_hunsha001.jpg', url: hunsha001 },
-    { id: 3, name: '濠氱罕003', path: 'picture/lucia_hunsha003.png', url: hunsha003 },
-    { id: 4, name: '鐏伴甫001', path: 'picture/lucia_raven001.png', url: raven001 },
-    { id: 5, name: '鐏伴甫002', path: 'picture/lucia_raven002.png', url: raven002 },
-    { id: 6, name: '鐏伴甫003', path: 'picture/lucia_raven003.jpg', url: raven003 },
-    { id: 7, name: '鐏伴甫004', path: 'picture/lucia_raven004.png', url: raven004 },
-    { id: 8, name: '瑾撶劙001', path: 'picture/luciaflame001.jpg', url: flame001 },
-    { id: 9, name: '瑾撶劙002', path: 'picture/luciaflame002.png', url: flame002 },
-    { id: 10, name: '瑾撶劙003', path: 'picture/luciaflame003.png', url: flame003 },
-    { id: 11, name: '濠氱罕002', path: 'picture/luciahunsha002.jpg', url: hunsha002 }
+    { id: 1, name: '誓焰004', path: 'picture/lucia_flame004.jpg', url: flame004 },
+    { id: 2, name: '婚纱001', path: 'picture/lucia_hunsha001.jpg', url: hunsha001 },
+    { id: 3, name: '婚纱003', path: 'picture/lucia_hunsha003.png', url: hunsha003 },
+    { id: 4, name: '灰鸦001', path: 'picture/lucia_raven001.png', url: raven001 },
+    { id: 5, name: '灰鸦002', path: 'picture/lucia_raven002.png', url: raven002 },
+    { id: 6, name: '灰鸦003', path: 'picture/lucia_raven003.jpg', url: raven003 },
+    { id: 7, name: '灰鸦004', path: 'picture/lucia_raven004.png', url: raven004 },
+    { id: 8, name: '誓焰001', path: 'picture/luciaflame001.jpg', url: flame001 },
+    { id: 9, name: '誓焰002', path: 'picture/luciaflame002.png', url: flame002 },
+    { id: 10, name: '誓焰003', path: 'picture/luciaflame003.png', url: flame003 },
+    { id: 11, name: '婚纱002', path: 'picture/luciahunsha002.jpg', url: hunsha002 }
 ]
 const THINKING_MESSAGES = [
-    '姝ｈ鐪熷惉鐫€...',
-    '鎯崇粰浣犱釜璁ょ湡鐨勭瓟澶嶁€?,
-    '鍦ㄥ憿鍦ㄥ憿...',
-    '璁╂垜缁勭粐涓€涓?..',
-    '闇茶タ浜氭浜嗘澶?..',
-    '鍞斺€﹁鎴戞兂鎯?,
-    '鎶夸簡鎶垮攪',
-    '姝ｅ湪鏁寸悊鎬濈华',
-    '璁╂€濈华钀藉畾鈥?,
-    '闇茶タ浜氭寚灏栬交鐐光€?
+    '正认真听着...',
+    '想给你个认真的答复…',
+    '在呢在呢...',
+    '让我组织一下...',
+    '露西亚歪了歪头...',
+    '唔…让我想想',
+    '抿了抿唇',
+    '正在整理思绪',
+    '让思绪落定…',
+    '露西亚指尖轻点…'
 ]
 
 let nextMessageId = 0
@@ -213,7 +213,7 @@ async function sendMessage() {
             ? recallMemories(content, scopeTag)
             .then(items => Promise.all(items.map(item => vault.decrypt(item.content))))
             .catch(error => {
-                console.error('妫€绱㈤暱鏈熻蹇嗗け璐?', error)
+                console.error('检索长期记忆失败:', error)
                 return []
             })
             : Promise.resolve([])
@@ -226,7 +226,7 @@ async function sendMessage() {
                 embedding: item.embedding
             })))
             if (encrypted.length) await saveMemories(savedUser.id, scopeTag, encrypted)
-        }).catch(error => console.error('淇濆瓨闀挎湡璁板繂澶辫触:', error))
+        }).catch(error => console.error('保存长期记忆失败:', error))
 
             : Promise.resolve()
 
@@ -259,11 +259,11 @@ async function sendMessage() {
         await rememberPromise
         await refreshConversationList()
     } catch (error) {
-        console.error('API 璋冪敤澶辫触:', error)
+        console.error('API 调用失败:', error)
         if (error.status === 401) {
             clearAccess()
             isAuthenticated.value = false
-            accessError.value = '璁块棶宸茶繃鏈燂紝璇烽噸鏂拌緭鍏ョ浜哄瘑鐮?
+            accessError.value = '访问已过期，请重新输入私人密码'
         }
         removeUiMessage(thinking.id)
         if (streamingMessage) {
@@ -273,7 +273,7 @@ async function sendMessage() {
         if (activeConversationId.value) {
             await loadConversation(activeConversationId.value).catch(() => {})
         }
-        messages.value.push(createMessage('assistant', `鉂?閿欒: ${error.message}`, { localOnly: true }))
+        messages.value.push(createMessage('assistant', `❌ 错误: ${error.message}`, { localOnly: true }))
     } finally {
         stopThinkingMessage()
         isSending.value = false
@@ -334,12 +334,12 @@ async function initializeConversations() {
         }
         await loadConversation(conversations.value[0].id)
     } catch (error) {
-        console.error('鍒濆鍖栧璇濆け璐?', error)
+        console.error('初始化对话失败:', error)
         showWelcome()
-        messages.value.push(createMessage('assistant', `鉂?鏃犳硶璇诲彇鏁版嵁搴撲腑鐨勫璇濓細${error.message}`, { localOnly: true }))
+        messages.value.push(createMessage('assistant', `❌ 无法读取数据库中的对话：${error.message}`, { localOnly: true }))
         if (error.status === 401) {
             isAuthenticated.value = false
-            accessError.value = '璁块棶宸茶繃鏈燂紝璇烽噸鏂拌緭鍏ョ浜哄瘑鐮?
+            accessError.value = '访问已过期，请重新输入私人密码'
         }
     } finally {
         isConversationLoading.value = false
@@ -396,7 +396,7 @@ async function migratePlaintextData() {
 
 function openConversations() {
     isConversationOpen.value = true
-    refreshConversationList().catch(error => console.error('鍒锋柊瀵硅瘽鍒楄〃澶辫触:', error))
+    refreshConversationList().catch(error => console.error('刷新对话列表失败:', error))
     nextTick(() => conversationModal.value?.querySelector('button')?.focus())
 }
 
@@ -426,14 +426,14 @@ async function startNewConversation(mode = MODES.DAILY) {
         closeConversations()
         nextTick(() => messageInput.value?.focus())
     } catch (error) {
-        console.error('鏂板缓瀵硅瘽澶辫触:', error)
+        console.error('新建对话失败:', error)
     } finally {
         isConversationLoading.value = false
     }
 }
 
 async function removeConversation(id) {
-    if (isSending.value || !window.confirm('纭畾鍒犻櫎杩欐潯瀵硅瘽鍚楋紵鍒犻櫎鍚庢棤娉曟仮澶嶃€?)) return
+    if (isSending.value || !window.confirm('确定删除这条对话吗？删除后无法恢复。')) return
     try {
         await deleteConversation(id)
         await refreshConversationList()
@@ -443,7 +443,7 @@ async function removeConversation(id) {
         }
         if (String(id) === activeConversationId.value) await loadConversation(conversations.value[0].id)
     } catch (error) {
-        console.error('鍒犻櫎瀵硅瘽澶辫触:', error)
+        console.error('删除对话失败:', error)
     }
 }
 
@@ -454,14 +454,14 @@ function formatConversationTime(value) {
 }
 
 function getConversationDisplayTitle(conversation) {
-    if (conversation.title && conversation.title !== '绉佸瘑瀵硅瘽') return conversation.title
-    return conversation.mode === MODES.INTIMATE ? '浜插瘑瀵硅瘽' : '鏃ュ父瀵硅瘽'
+    if (conversation.title && conversation.title !== '私密对话') return conversation.title
+    return conversation.mode === MODES.INTIMATE ? '亲密对话' : '日常对话'
 }
 
 async function renameConversationItem(conversation) {
     if (isSending.value || isConversationLoading.value) return
     const currentTitle = getConversationDisplayTitle(conversation)
-    const nextTitle = window.prompt('閲嶅懡鍚嶅璇?, currentTitle)
+    const nextTitle = window.prompt('重命名对话', currentTitle)
     if (nextTitle === null) return
     const title = nextTitle.trim()
     if (!title || title === currentTitle) return
@@ -472,7 +472,7 @@ async function renameConversationItem(conversation) {
         if (target) target.title = renamed?.title || title
         conversations.value = [...conversations.value]
     } catch (error) {
-        console.error('閲嶅懡鍚嶅璇濆け璐?', error)
+        console.error('重命名对话失败:', error)
         window.alert(error.message)
     }
 }
@@ -527,7 +527,7 @@ async function unlock() {
     const privatePassword = memoryPassword.value
     if (!password || privatePassword.length < 8 || isUnlocking.value) return
     if (password === privatePassword) {
-        accessError.value = '璁板繂瀵嗙爜涓嶈兘鍜岃闂瘑鐮佺浉鍚岋紝鍚﹀垯鏈嶅姟鍣ㄤ篃鑳芥帹瀵煎嚭瑙ｅ瘑瀵嗛挜'
+        accessError.value = '记忆密码不能和访问密码相同，否则服务器也能推导出解密密钥'
         return
     }
 
@@ -548,7 +548,7 @@ async function unlock() {
         nextTick(() => messageInput.value?.focus())
     } catch (error) {
         accessError.value = error instanceof TypeError
-            ? '鏃犳硶杩炴帴绉佷汉鍚庣锛岃妫€鏌ユ湇鍔℃槸鍚﹀凡鍚姩'
+            ? '无法连接私人后端，请检查服务是否已启动'
             : error.message
         nextTick(() => accessPasswordInput.value?.focus())
     } finally {
@@ -577,8 +577,8 @@ onBeforeUnmount(() => {
     <div v-if="!isAuthenticated" class="settings-panel access-panel">
         <div v-if="isAuthChecking" class="settings-content access-content" role="status" aria-live="polite">
             <p class="access-kicker">PRIVATE LINK</p>
-            <h2>姝ｅ湪楠岃瘉绉佷汉閫氳</h2>
-            <p class="access-description">姝ｅ湪妫€鏌ュ綋鍓嶆爣绛鹃〉鐨勮闂姸鎬侊紝璇风◢鍊欍€?/p>
+            <h2>正在验证私人通讯</h2>
+            <p class="access-description">正在检查当前标签页的访问状态，请稍候。</p>
         </div>
         <form
             v-else
@@ -587,9 +587,9 @@ onBeforeUnmount(() => {
             @submit.prevent="unlock"
         >
             <p class="access-kicker">PRIVATE LINK</p>
-            <h2 id="accessTitle">瑙ｉ攣闇茶タ浜氶€氳</h2>
-            <p class="access-description">鑱婂ぉ璁板綍浼氬湪褰撳墠璁惧瑙ｅ瘑銆傝蹇嗗瘑鐮佷笉浼氬彂閫佸埌鏈嶅姟鍣紝鍏抽棴椤甸潰鍚庨渶瑕侀噸鏂拌緭鍏ャ€?/p>
-            <label for="accessPasswordInput">璁块棶瀵嗙爜</label>
+            <h2 id="accessTitle">解锁露西亚通讯</h2>
+            <p class="access-description">聊天记录会在当前设备解密。记忆密码不会发送到服务器，关闭页面后需要重新输入。</p>
+            <label for="accessPasswordInput">访问密码</label>
             <input
                 id="accessPasswordInput"
                 ref="accessPasswordInput"
@@ -597,12 +597,12 @@ onBeforeUnmount(() => {
                 type="password"
                 class="access-password-input"
                 autocomplete="current-password"
-                placeholder="杈撳叆绉佷汉璁块棶瀵嗙爜"
+                placeholder="输入私人访问密码"
                 :aria-invalid="Boolean(accessError)"
                 :aria-describedby="accessError ? 'accessError' : undefined"
                 @input="accessError = ''"
             >
-            <label for="memoryPasswordInput">璁板繂瀵嗙爜</label>
+            <label for="memoryPasswordInput">记忆密码</label>
             <input
                 id="memoryPasswordInput"
                 ref="memoryPasswordInput"
@@ -610,7 +610,7 @@ onBeforeUnmount(() => {
                 type="password"
                 class="access-password-input"
                 autocomplete="off"
-                placeholder="鑷冲皯 8 涓瓧绗︼紝蹇呴』鐗㈣"
+                placeholder="至少 8 个字符，必须牢记"
                 :aria-invalid="Boolean(accessError)"
                 :aria-describedby="accessError ? 'accessError' : undefined"
                 @input="accessError = ''"
@@ -621,9 +621,9 @@ onBeforeUnmount(() => {
                 class="settings-save-btn access-submit"
                 :disabled="isUnlocking || memoryPassword.length < 8 || !accessPassword.trim()"
             >
-                {{ isUnlocking ? '姝ｅ湪楠岃瘉鈥? : '瑙ｉ攣閫氳' }}
+                {{ isUnlocking ? '正在验证…' : '解锁通讯' }}
             </button>
-            <p class="settings-hint">绗竴娆¤緭鍏ョ殑璁板繂瀵嗙爜灏嗙敤浜庡姞瀵嗗叏閮ㄥ巻鍙层€傚畠鏃犳硶鎵惧洖锛屼篃涓嶈鍜岃闂瘑鐮佷娇鐢ㄧ浉鍚屽唴瀹广€?/p>
+            <p class="settings-hint">第一次输入的记忆密码将用于加密全部历史。它无法找回，也不要和访问密码使用相同内容。</p>
         </form>
     </div>
 
@@ -637,14 +637,14 @@ onBeforeUnmount(() => {
                         class="identity-code identity-code-button"
                         :class="{ 'is-chinese': isIdentityChinese }"
                         :aria-pressed="isIdentityChinese"
-                        :title="isIdentityChinese ? '鍒囨崲涓鸿嫳鏂? : '鍒囨崲涓轰腑鏂?"
+                        :title="isIdentityChinese ? '切换为英文' : '切换为中文'"
                         @click="toggleIdentityLanguage"
                     >
-                        {{ isIdentityChinese ? '鐏伴甫鍐涘洟缁熷竻锛堣€佸﹩锛? : 'GRAY RAVEN COMMANDER // WIFE' }}
+                        {{ isIdentityChinese ? '灰鸦军团统帅（老婆）' : 'GRAY RAVEN COMMANDER // WIFE' }}
                     </button>
                     <div class="identity-line">
-                        <h1>闇茶タ浜?/h1>
-                        <span class="online-status"><span class="status-dot"></span>閫氳鍦ㄧ嚎</span>
+                        <h1>露西亚</h1>
+                        <span class="online-status"><span class="status-dot"></span>通讯在线</span>
                     </div>
                 </div>
             </div>
@@ -657,13 +657,13 @@ onBeforeUnmount(() => {
                     ref="conversationButton"
                     type="button"
                     class="panorama-button conversation-button"
-                    title="鏌ョ湅鍘嗗彶瀵硅瘽"
+                    title="查看历史对话"
                     @click="openConversations"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M5 5h14v11H9l-4 3V5Z" />
                     </svg>
-                    <span class="panorama-label">瀵硅瘽</span>
+                    <span class="panorama-label">对话</span>
                     <span class="panorama-state">{{ conversations.length }}</span>
                 </button>
                 <button
@@ -671,21 +671,21 @@ onBeforeUnmount(() => {
                     class="panorama-button"
                     :class="{ active: isPanorama }"
                     :aria-pressed="isPanorama"
-                    :title="isPanorama ? '閫€鍑哄叏鏅ā寮? : '寮€鍚叏鏅ā寮?"
+                    :title="isPanorama ? '退出全景模式' : '开启全景模式'"
                     @click="togglePanorama"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M4 9V5h4M16 5h4v4M20 15v4h-4M8 19H4v-4M8 12h8" />
                     </svg>
-                    <span class="panorama-label">鍏ㄦ櫙</span>
+                    <span class="panorama-label">全景</span>
                     <span class="panorama-state">{{ isPanorama ? 'ON' : 'OFF' }}</span>
                 </button>
                 <button
                     ref="backgroundButton"
                     type="button"
                     class="icon-button header-background-button"
-                    title="鏇存崲鑳屾櫙"
-                    aria-label="閫夋嫨鑱婂ぉ鑳屾櫙"
+                    title="更换背景"
+                    aria-label="选择聊天背景"
                     @click="openBackgrounds"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -702,7 +702,7 @@ onBeforeUnmount(() => {
             class="chat-box"
             role="log"
             aria-live="polite"
-            aria-label="瀵硅瘽璁板綍"
+            aria-label="对话记录"
             :aria-busy="isSending"
         >
             <div class="messages">
@@ -724,19 +724,19 @@ onBeforeUnmount(() => {
                     :class="{ active: useLongTermRecall }"
                     :aria-pressed="useLongTermRecall"
                     :disabled="isSending || isConversationLoading || !activeConversationId"
-                    title="鑱旀兂闀挎湡璁板繂"
+                    title="联想长期记忆"
                     @click="useLongTermRecall = !useLongTermRecall"
                 >
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 16Z" /></svg>
-                    <span>鑱旀兂</span>
+                    <span>联想</span>
                 </button>
                 <textarea
                     ref="messageInput"
                     v-model="draft"
                     class="message-input"
-                    aria-label="杈撳叆娑堟伅"
-                    title="Enter 鍙戦€侊紝Shift + Enter 鎹㈣"
-                    placeholder="杈撳叆娑堟伅鈥?
+                    aria-label="输入消息"
+                    title="Enter 发送，Shift + Enter 换行"
+                    placeholder="输入消息…"
                 rows="1"
                 :disabled="isConversationLoading || !activeConversationId"
                     @input="resizeComposer"
@@ -749,11 +749,11 @@ onBeforeUnmount(() => {
                 :class="{ active: useLongTermRecall }"
                 :aria-pressed="useLongTermRecall"
                 :disabled="isSending || isConversationLoading || !activeConversationId"
-                title="鑱旀兂闀挎湡璁板繂"
+                title="联想长期记忆"
                 @click="useLongTermRecall = !useLongTermRecall"
             >
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" /></svg>
-                <span>鑱旀兂</span>
+                <span>联想</span>
             </button>
             <button
                 type="button"
@@ -766,7 +766,7 @@ onBeforeUnmount(() => {
                 <span class="send-particles" aria-hidden="true">
                     <span v-for="particle in 8" :key="particle" class="send-particle"></span>
                 </span>
-                <span>鍙戦€?/span>
+                <span>发送</span>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14-7-4 14-3-6-7-1z" /></svg>
             </button>
         </div>
@@ -785,9 +785,9 @@ onBeforeUnmount(() => {
             <div class="bg-modal-header conversation-modal-header">
                 <div>
                     <p class="access-kicker">MEMORY LOG</p>
-                    <h3 id="conversationModalTitle">鍘嗗彶瀵硅瘽</h3>
+                    <h3 id="conversationModalTitle">历史对话</h3>
                 </div>
-                <button type="button" class="icon-button bg-modal-close" aria-label="鍏抽棴鍘嗗彶瀵硅瘽" @click="closeConversations">
+                <button type="button" class="icon-button bg-modal-close" aria-label="关闭历史对话" @click="closeConversations">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
                 </button>
             </div>
@@ -798,7 +798,7 @@ onBeforeUnmount(() => {
                     :disabled="isSending || isConversationLoading"
                     @click="startNewConversation()"
                 >
-                    锛?鏂板缓瀵硅瘽
+                    ＋ 新建对话
                 </button>
                 <button
                     type="button"
@@ -806,9 +806,10 @@ onBeforeUnmount(() => {
                     :disabled="isSending || isConversationLoading"
                     @click="startNewConversation(MODES.INTIMATE)"
                 >
-                    寮€鍚翰瀵嗘ā寮?                </button>
+                    开启亲密模式
+                </button>
             </div>
-            <div class="conversation-list" aria-label="宸蹭繚瀛樼殑瀵硅瘽">
+            <div class="conversation-list" aria-label="已保存的对话">
                 <article
                     v-for="conversation in conversations"
                     :key="conversation.id"
@@ -828,13 +829,14 @@ onBeforeUnmount(() => {
                             </span>
                         </span>
                         <span class="conversation-meta">
-                            {{ formatConversationTime(conversation.updated_at) }} 路 {{ conversation.message_count }} 鏉?                        </span>
+                            {{ formatConversationTime(conversation.updated_at) }} · {{ conversation.message_count }} 条
+                        </span>
                     </button>
                     <button
                         type="button"
                         class="conversation-rename"
-                        :aria-label="`閲嶅懡鍚嶅璇濓細${getConversationDisplayTitle(conversation)}`"
-                        title="閲嶅懡鍚嶅璇?
+                        :aria-label="`重命名对话：${getConversationDisplayTitle(conversation)}`"
+                        title="重命名对话"
                         @click="renameConversationItem(conversation)"
                     >
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -845,8 +847,8 @@ onBeforeUnmount(() => {
                     <button
                         type="button"
                         class="conversation-delete"
-                        :aria-label="`鍒犻櫎瀵硅瘽锛?{getConversationDisplayTitle(conversation)}`"
-                        title="鍒犻櫎瀵硅瘽"
+                        :aria-label="`删除对话：${getConversationDisplayTitle(conversation)}`"
+                        title="删除对话"
                         @click="removeConversation(conversation.id)"
                     >
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -869,8 +871,8 @@ onBeforeUnmount(() => {
     >
         <div class="bg-modal-content">
             <div class="bg-modal-header">
-                <h3 id="bgModalTitle">閫夋嫨鑳屾櫙</h3>
-                <button type="button" class="icon-button bg-modal-close" aria-label="鍏抽棴鑳屾櫙閫夋嫨" @click="closeBackgrounds">
+                <h3 id="bgModalTitle">选择背景</h3>
+                <button type="button" class="icon-button bg-modal-close" aria-label="关闭背景选择" @click="closeBackgrounds">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
                 </button>
             </div>
@@ -882,7 +884,7 @@ onBeforeUnmount(() => {
                     class="bg-item"
                     :class="{ selected: background.id === selectedBackground.id }"
                     :style="{ backgroundImage: `url('${background.url}')` }"
-                    :aria-label="`浣跨敤${background.name}鑳屾櫙`"
+                    :aria-label="`使用${background.name}背景`"
                     :aria-pressed="background.id === selectedBackground.id"
                     @click="chooseBackground(background)"
                 >
