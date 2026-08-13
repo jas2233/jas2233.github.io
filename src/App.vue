@@ -581,7 +581,7 @@ onBeforeUnmount(() => {
         <div v-if="isAuthChecking" class="settings-content access-content" role="status" aria-live="polite">
             <p class="access-kicker">PRIVATE LINK</p>
             <h2>姝ｅ湪楠岃瘉绉佷汉閫氳</h2>
-            <p class="access-description">姝ｅ湪妫€鏌ュ綋鍓嶆爣绛鹃〉鐨勮闂姸鎬侊紝璇风◢鍊欍€?/p>
+            <p class="access-description">&#x6B63;&#x5728;&#x68C0;&#x67E5;&#x5F53;&#x524D;&#x6807;&#x7B7E;&#x9875;&#x7684;&#x8BBF;&#x95EE;&#x72B6;&#x6001;&#xFF0C;&#x8BF7;&#x7A0D;&#x5019;&#x3002;</p>
         </div>
         <form
             v-else
@@ -591,7 +591,7 @@ onBeforeUnmount(() => {
         >
             <p class="access-kicker">PRIVATE LINK</p>
             <h2 id="accessTitle">瑙ｉ攣闇茶タ浜氶€氳</h2>
-            <p class="access-description">鑱婂ぉ璁板綍浼氬湪褰撳墠璁惧瑙ｅ瘑銆傝蹇嗗瘑鐮佷笉浼氬彂閫佸埌鏈嶅姟鍣紝鍏抽棴椤甸潰鍚庨渶瑕侀噸鏂拌緭鍏ャ€?/p>
+            <p class="access-description">&#x6B63;&#x5728;&#x68C0;&#x67E5;&#x5F53;&#x524D;&#x6807;&#x7B7E;&#x9875;&#x7684;&#x8BBF;&#x95EE;&#x72B6;&#x6001;&#xFF0C;&#x8BF7;&#x7A0D;&#x5019;&#x3002;</p>
             <label for="accessPasswordInput">璁块棶瀵嗙爜</label>
             <input
                 id="accessPasswordInput"
@@ -626,7 +626,7 @@ onBeforeUnmount(() => {
             >
                 {{ isUnlocking ? '姝ｅ湪楠岃瘉鈥? : '瑙ｉ攣閫氳' }}
             </button>
-            <p class="settings-hint">绗竴娆¤緭鍏ョ殑璁板繂瀵嗙爜灏嗙敤浜庡姞瀵嗗叏閮ㄥ巻鍙层€傚畠鏃犳硶鎵惧洖锛屼篃涓嶈鍜岃闂瘑鐮佷娇鐢ㄧ浉鍚屽唴瀹广€?/p>
+            <p class="settings-hint">&#x8BB0;&#x5FC6;&#x5BC6;&#x7801;&#x7528;&#x4E8E;&#x52A0;&#x5BC6;&#x6570;&#x636E;&#xFF0C;&#x65E0;&#x6CD5;&#x627E;&#x56DE;&#xFF0C;&#x8BF7;&#x52A1;&#x5FC5;&#x7262;&#x8BB0;&#x3002;</p>
         </form>
     </div>
 
@@ -739,7 +739,7 @@ onBeforeUnmount(() => {
                     class="message-input"
                     aria-label="杈撳叆娑堟伅"
                     title="Enter 鍙戦€侊紝Shift + Enter 鎹㈣"
-                    placeholder="杈撳叆娑堟伅鈥?
+                    placeholder="&#x8F93;&#x5165;&#x6D88;&#x606F;&#x2026;"
                 rows="1"
                 :disabled="isConversationLoading || !activeConversationId"
                     @input="resizeComposer"
