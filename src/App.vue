@@ -738,9 +738,11 @@ onBeforeUnmount(() => {
                     title="Enter 发送，Shift + Enter 换行"
                     placeholder="输入消息…"
                 rows="1"
-                :disabled="isConversationLoading || !activeConversationId"
+                    :disabled="isConversationLoading || !activeConversationId"
                     @input="resizeComposer"
                     @keydown="handleComposerKeydown"
+                    @touchstart.stop
+                    @touchmove.stop
                 />
             </div>
             <button
