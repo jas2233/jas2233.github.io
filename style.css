@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 0.7 seconds
-Output:
 :root {
     --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --color-text: #f1f5f9;
@@ -1183,7 +1180,7 @@ button {
 }
 
 .bg-item::after {
-    content: "\\2713";
+    content: "鉁?;
     position: absolute;
     top: 8px;
     right: 8px;
@@ -1448,4 +1445,3 @@ button {
         transition-duration: 1ms !important;
     }
 }
-
