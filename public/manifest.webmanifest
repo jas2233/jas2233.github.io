@@ -1,0 +1,15 @@
+{
+    "name": "露西亚 - 灰鸦小队",
+    "short_name": "露西亚",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a101e",
+    "theme_color": "#0a101e",
+    "icons": [
+        {
+            "src": "/gray-raven-icon.png",
+            "sizes": "649x580",
+            "type": "image/png"
+        }
+    ]
+}
