@@ -1183,7 +1183,7 @@ button {
 }
 
 .bg-item::after {
-    content: "鉁?;
+    content: "\\2713";
     position: absolute;
     top: 8px;
     right: 8px;
