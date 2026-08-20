@@ -6,6 +6,9 @@ import { db } from './db.js'
 import { createEmbeddingClient } from './embedding.js'
 import { createMemoryRouter, createMemoryService } from './memories.js'
 import { createPrivacyRouter } from './privacy.js'
+import { createVoiceCipher } from './voice-crypto.js'
+import { createVoiceService, createVoiceRouter, createVoiceWorkerRouter } from './voice.js'
+import { createVoiceStorage } from './voice-storage.js'
 
 const app = express()
 const port = Number(process.env.PORT || 3000)
@@ -34,6 +37,17 @@ const chat = createChatHandler({
     openRouterApiKey: process.env.OPENROUTER_API_KEY,
     openRouterModel: process.env.OPENROUTER_MODEL
 })
+const voiceConfigured = process.env.VOICE_TASK_KEY && process.env.VOICE_WORKER_TOKEN
+const voice = voiceConfigured ? createVoiceService({
+    database: db,
+    cipher: createVoiceCipher(process.env.VOICE_TASK_KEY),
+    storage: createVoiceStorage({
+        url: process.env.SUPABASE_URL,
+        serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        bucket: process.env.SUPABASE_VOICE_BUCKET || 'voice-audio'
+    })
+}) : null
+if (!voice) console.warn('未配置语音任务密钥，GPT-SoVITS 接口暂未启用')
 
 app.disable('x-powered-by')
 app.set('trust proxy', 1)
@@ -58,6 +72,7 @@ app.use((request, response, next) => {
 })
 
 app.post('/api/auth/login', auth.login)
+if (voice) app.use('/api/voice-worker', createVoiceWorkerRouter(voice, process.env.VOICE_WORKER_TOKEN))
 
 app.get('/api/health', async (_request, response) => {
     try {
@@ -75,6 +90,7 @@ app.get('/api/auth/session', (_request, response) => {
 })
 app.use('/api/conversations', createConversationRouter(conversationStore))
 app.use('/api/encryption', createPrivacyRouter(db))
+if (voice) app.use('/api/voice', createVoiceRouter(voice))
 if (memory) app.use('/api/memories', createMemoryRouter(memory))
 app.post('/api/chat', chat)
 

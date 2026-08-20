@@ -13,6 +13,7 @@ import {
 } from './services/conversations.js'
 import { createVault, createVerifier, isEncrypted, verifyVault } from './services/crypto.js'
 import { streamDeepSeekReply } from './services/deepseek.js'
+import { createVoiceTask, getVoiceTask } from './services/voice.js'
 import {
     assignLegacyScope,
     getEncryptionConfig,
@@ -115,6 +116,7 @@ const conversationModal = ref(null)
 let sendBurstTimer
 let linkProgressTimer
 let thinkingTimer
+const voiceTimers = new Map()
 let vault
 let modeTags
 
@@ -179,6 +181,44 @@ function startThinkingMessage() {
 function stopThinkingMessage() {
     window.clearInterval(thinkingTimer)
     thinkingTimer = undefined
+}
+
+function stopVoicePolling(messageId) {
+    window.clearTimeout(voiceTimers.get(messageId))
+    voiceTimers.delete(messageId)
+}
+
+async function pollVoiceTask(message, taskId) {
+    try {
+        const task = await getVoiceTask(taskId)
+        message.voice = {
+            ...message.voice,
+            status: task.status,
+            error: task.error || '',
+            audioUrl: task.audio_url || ''
+        }
+        if (['completed', 'failed'].includes(task.status)) {
+            stopVoicePolling(message.id)
+            return
+        }
+        voiceTimers.set(message.id, window.setTimeout(() => pollVoiceTask(message, taskId), 2000))
+    } catch (error) {
+        message.voice = { ...message.voice, status: 'failed', error: error.message }
+        stopVoicePolling(message.id)
+    }
+}
+
+async function speakMessage({ message, target }) {
+    const messageId = String(message.id).match(/^db-(\d+)$/)?.[1]
+    if (!messageId || ['pending', 'processing'].includes(message.voice?.status)) return
+    stopVoicePolling(message.id)
+    message.voice = { target, status: 'pending', error: '', audioUrl: '' }
+    try {
+        const task = await createVoiceTask(messageId, message.content, target)
+        await pollVoiceTask(message, task.id)
+    } catch (error) {
+        message.voice = { target, status: 'failed', error: error.message, audioUrl: '' }
+    }
 }
 
 async function sendMessage() {
@@ -253,9 +293,10 @@ async function sendMessage() {
         })
 
         streamingMessage.streaming = false
-        await appendConversationMessage(
+        const savedAssistant = await appendConversationMessage(
             activeConversationId.value, 'assistant', await vault.encrypt(reply)
         )
+        streamingMessage.id = `db-${savedAssistant.id}`
         await rememberPromise
         await refreshConversationList()
     } catch (error) {
@@ -569,6 +610,8 @@ onBeforeUnmount(() => {
     window.clearTimeout(sendBurstTimer)
     stopLinkSync()
     stopThinkingMessage()
+    for (const timer of voiceTimers.values()) window.clearTimeout(timer)
+    voiceTimers.clear()
     document.body.classList.remove('is-panorama')
 })
 </script>
@@ -712,6 +755,7 @@ onBeforeUnmount(() => {
                     :message="message"
                     :lucia-avatar="luciaAvatar"
                     :commander-avatar="commanderAvatar"
+                    @speak="speakMessage"
                 />
             </div>
         </div>
