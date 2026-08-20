@@ -7,7 +7,7 @@
     "dev": "vite",
     "server": "node --env-file-if-exists=.env server/index.js",
     "server:dev": "node --env-file-if-exists=.env --watch server/index.js",
-    "voice:worker": "node --env-file-if-exists=.env.voice scripts/voice-worker.mjs",
+    "voice:worker": "node --env-file-if-exists=.env scripts/voice-worker.mjs",
     "db:init": "node --env-file-if-exists=.env scripts/init-db.mjs",
     "build": "vite build",
     "preview": "vite preview",

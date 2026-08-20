@@ -2,10 +2,11 @@
 defineProps({
     message: { type: Object, required: true },
     luciaAvatar: { type: String, required: true },
-    commanderAvatar: { type: String, required: true }
+    commanderAvatar: { type: String, required: true },
+    computerVoiceEnabled: { type: Boolean, default: false },
+    mobileVoiceEnabled: { type: Boolean, default: false }
 })
 defineEmits(['speak'])
-
 const voiceLabel = message => ({
     pending: '等待电脑',
     processing: '正在生成',
@@ -29,28 +30,23 @@ const voiceLabel = message => ({
             :class="message.role === 'user' ? 'user-avatar' : 'ai-avatar'"
         >
         <div class="message-bubble">
-            <span class="message-author">{{ message.role === 'user' ? '指挥官' : '露西亚' }}</span>
+            <div class="message-heading">
+                <span class="message-author">{{ message.role === 'user' ? '指挥官' : '露西亚' }}</span>
+                <div
+                    v-if="message.role === 'assistant' && !message.localOnly && !message.thinking && !message.streaming && (computerVoiceEnabled || mobileVoiceEnabled)"
+                    class="message-voice-controls"
+                >
+                    <button v-if="computerVoiceEnabled" type="button" class="message-voice-button" title="电脑播放" aria-label="电脑播放" :disabled="['pending', 'processing'].includes(message.voice?.status)" @click="$emit('speak', { message, target: 'computer' })">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Zm12.5 2a4.5 4.5 0 0 0-2-3.74v7.48A4.5 4.5 0 0 0 16.5 12Zm0-8v2.06a6.5 6.5 0 0 1 0 11.88V20a8.5 8.5 0 0 0 0-16Z" /></svg>
+                    </button>
+                    <button v-if="mobileVoiceEnabled" type="button" class="message-voice-button" title="手机播放" aria-label="手机播放" :disabled="['pending', 'processing'].includes(message.voice?.status)" @click="$emit('speak', { message, target: 'mobile' })">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2" /><path d="m11 10 4 2-4 2v-4Z" /></svg>
+                    </button>
+                </div>
+            </div>
             <p>{{ message.content }}</p>
-            <div
-                v-if="message.role === 'assistant' && !message.localOnly && !message.thinking && !message.streaming"
-                class="voice-actions"
-            >
-                <button
-                    type="button"
-                    class="voice-button"
-                    :disabled="['pending', 'processing'].includes(message.voice?.status)"
-                    @click="$emit('speak', { message, target: 'computer' })"
-                >
-                    {{ message.voice?.target === 'computer' ? voiceLabel(message) : '电脑播放' }}
-                </button>
-                <button
-                    type="button"
-                    class="voice-button"
-                    :disabled="['pending', 'processing'].includes(message.voice?.status)"
-                    @click="$emit('speak', { message, target: 'mobile' })"
-                >
-                    {{ message.voice?.target === 'mobile' ? voiceLabel(message) : '手机播放' }}
-                </button>
+            <div v-if="message.voice?.status" class="voice-actions">
+                <span v-if="message.voice?.target === 'computer'" class="voice-status">{{ voiceLabel(message) }}</span>
                 <span v-if="message.voice?.status === 'failed'" class="voice-error">
                     {{ message.voice.error }}
                 </span>

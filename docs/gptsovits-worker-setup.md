@@ -39,11 +39,10 @@ SUPABASE_VOICE_BUCKET=voice-audio
 在项目根目录运行：
 
 ```powershell
-Copy-Item .\voice-worker.env.example .\.env.voice
-notepad .\.env.voice
+notepad .\.env
 ```
 
-只需把 `.env.voice` 中的 `VOICE_WORKER_TOKEN` 改成 Vercel 中完全相同的第二个密钥。默认模型、参考音频、参考文本和正式 Vercel 地址已经填写。
+只需把 `.env` 中的 `VOICE_WORKER_TOKEN` 改成 Vercel 中完全相同的第二个密钥。默认模型、参考音频、参考文本和本地测试地址已经填写。
 
 ## 5. 启动本地服务
 
