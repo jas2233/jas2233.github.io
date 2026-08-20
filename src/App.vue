@@ -13,6 +13,7 @@ import {
 } from './services/conversations.js'
 import { createVault, createVerifier, isEncrypted, verifyVault } from './services/crypto.js'
 import { streamDeepSeekReply } from './services/deepseek.js'
+import { createVoiceTask, getVoiceTask } from './services/voice.js'
 import {
     assignLegacyScope,
     getEncryptionConfig,
@@ -88,6 +89,9 @@ const activeConversationId = ref('')
 const activeConversationMode = ref(MODES.DAILY)
 const draft = ref('')
 const useLongTermRecall = ref(false)
+const isComputerVoiceEnabled = ref(false)
+const isMobileVoiceEnabled = ref(false)
+const isComposerMenuOpen = ref(false)
 const isSending = ref(false)
 const isSendBurst = ref(false)
 const linkProgress = ref('100%')
@@ -100,14 +104,12 @@ const isAuthChecking = ref(true)
 const isAuthenticated = ref(false)
 const isUnlocking = ref(false)
 const accessPassword = ref('')
-const memoryPassword = ref('')
 const accessError = ref('')
 const selectedBackground = ref(BACKGROUNDS.find(item => item.path === settings.backgroundPath) || BACKGROUNDS[0])
 
 const chatBox = ref(null)
 const messageInput = ref(null)
 const accessPasswordInput = ref(null)
-const memoryPasswordInput = ref(null)
 const backgroundButton = ref(null)
 const backgroundModal = ref(null)
 const conversationButton = ref(null)
@@ -115,6 +117,7 @@ const conversationModal = ref(null)
 let sendBurstTimer
 let linkProgressTimer
 let thinkingTimer
+const voiceTimers = new Map()
 let vault
 let modeTags
 
@@ -179,6 +182,55 @@ function startThinkingMessage() {
 function stopThinkingMessage() {
     window.clearInterval(thinkingTimer)
     thinkingTimer = undefined
+}
+
+function stopVoicePolling(messageId) {
+    window.clearTimeout(voiceTimers.get(messageId))
+    voiceTimers.delete(messageId)
+}
+
+async function pollVoiceTask(message, taskId) {
+    try {
+        const task = await getVoiceTask(taskId)
+        message.voice = {
+            ...message.voice,
+            status: task.status,
+            error: task.error || '',
+            audioUrl: task.audio_url || ''
+        }
+        if (['completed', 'failed'].includes(task.status)) {
+            stopVoicePolling(message.id)
+            return
+        }
+        voiceTimers.set(message.id, window.setTimeout(() => pollVoiceTask(message, taskId), 2000))
+    } catch (error) {
+        message.voice = { ...message.voice, status: 'failed', error: error.message }
+        stopVoicePolling(message.id)
+    }
+}
+
+async function speakMessage({ message, target }) {
+    const messageId = String(message.id).match(/^db-(\d+)$/)?.[1]
+    if (!messageId || ['pending', 'processing'].includes(message.voice?.status)) return
+    stopVoicePolling(message.id)
+    message.voice = { target, status: 'pending', error: '', audioUrl: '' }
+    try {
+        const task = await createVoiceTask(messageId, message.content, target)
+        await pollVoiceTask(message, task.id)
+    } catch (error) {
+        message.voice = { target, status: 'failed', error: error.message, audioUrl: '' }
+    }
+}
+
+function toggleVoiceAction(target) {
+    if (target === 'computer') isComputerVoiceEnabled.value = !isComputerVoiceEnabled.value
+    else isMobileVoiceEnabled.value = !isMobileVoiceEnabled.value
+    isComposerMenuOpen.value = false
+}
+
+function toggleRecallMode() {
+    useLongTermRecall.value = !useLongTermRecall.value
+    isComposerMenuOpen.value = false
 }
 
 async function sendMessage() {
@@ -253,9 +305,10 @@ async function sendMessage() {
         })
 
         streamingMessage.streaming = false
-        await appendConversationMessage(
+        const savedAssistant = await appendConversationMessage(
             activeConversationId.value, 'assistant', await vault.encrypt(reply)
         )
+        streamingMessage.id = `db-${savedAssistant.id}`
         await rememberPromise
         await refreshConversationList()
     } catch (error) {
@@ -518,31 +571,26 @@ function chooseBackground(background) {
 
 function handleEscape(event) {
     if (event.key !== 'Escape') return
-    if (isConversationOpen.value) closeConversations()
+    if (isComposerMenuOpen.value) isComposerMenuOpen.value = false
+    else if (isConversationOpen.value) closeConversations()
     else if (isBackgroundOpen.value) closeBackgrounds()
 }
 
 async function unlock() {
     const password = accessPassword.value.trim()
-    const privatePassword = memoryPassword.value
-    if (!password || privatePassword.length < 8 || isUnlocking.value) return
-    if (password === privatePassword) {
-        accessError.value = '记忆密码不能和访问密码相同，否则服务器也能推导出解密密钥'
-        return
-    }
+    if (password.length < 8 || isUnlocking.value) return
 
     isUnlocking.value = true
     accessError.value = ''
     try {
         await unlockAccess(password)
-        vault = await unlockMemory(privatePassword)
+        vault = await unlockMemory(password)
         modeTags = {
             daily: await vault.fingerprint('conversation-mode:daily'),
             intimate: await vault.fingerprint('conversation-mode:intimate')
         }
         await migratePlaintextData()
         accessPassword.value = ''
-        memoryPassword.value = ''
         isAuthenticated.value = true
         await initializeConversations()
         nextTick(() => messageInput.value?.focus())
@@ -569,6 +617,8 @@ onBeforeUnmount(() => {
     window.clearTimeout(sendBurstTimer)
     stopLinkSync()
     stopThinkingMessage()
+    for (const timer of voiceTimers.values()) window.clearTimeout(timer)
+    voiceTimers.clear()
     document.body.classList.remove('is-panorama')
 })
 </script>
@@ -588,8 +638,8 @@ onBeforeUnmount(() => {
         >
             <p class="access-kicker">PRIVATE LINK</p>
             <h2 id="accessTitle">解锁露西亚通讯</h2>
-            <p class="access-description">聊天记录会在当前设备解密。记忆密码不会发送到服务器，关闭页面后需要重新输入。</p>
-            <label for="accessPasswordInput">访问密码</label>
+            <p class="access-description">输入密码即可访问聊天并解密当前设备上的聊天记录。关闭页面后需要重新输入。</p>
+            <label for="accessPasswordInput">密码</label>
             <input
                 id="accessPasswordInput"
                 ref="accessPasswordInput"
@@ -597,20 +647,7 @@ onBeforeUnmount(() => {
                 type="password"
                 class="access-password-input"
                 autocomplete="current-password"
-                placeholder="输入私人访问密码"
-                :aria-invalid="Boolean(accessError)"
-                :aria-describedby="accessError ? 'accessError' : undefined"
-                @input="accessError = ''"
-            >
-            <label for="memoryPasswordInput">记忆密码</label>
-            <input
-                id="memoryPasswordInput"
-                ref="memoryPasswordInput"
-                v-model="memoryPassword"
-                type="password"
-                class="access-password-input"
-                autocomplete="off"
-                placeholder="至少 8 个字符，必须牢记"
+                placeholder="输入密码"
                 :aria-invalid="Boolean(accessError)"
                 :aria-describedby="accessError ? 'accessError' : undefined"
                 @input="accessError = ''"
@@ -619,11 +656,11 @@ onBeforeUnmount(() => {
             <button
                 type="submit"
                 class="settings-save-btn access-submit"
-                :disabled="isUnlocking || memoryPassword.length < 8 || !accessPassword.trim()"
+                :disabled="isUnlocking || accessPassword.trim().length < 8"
             >
                 {{ isUnlocking ? '正在验证…' : '解锁通讯' }}
             </button>
-            <p class="settings-hint">第一次输入的记忆密码将用于加密全部历史。它无法找回，也不要和访问密码使用相同内容。</p>
+            <p class="settings-hint">请牢记此密码：它同时用于访问和解密全部聊天记录，无法找回。</p>
         </form>
     </div>
 
@@ -712,24 +749,40 @@ onBeforeUnmount(() => {
                     :message="message"
                     :lucia-avatar="luciaAvatar"
                     :commander-avatar="commanderAvatar"
+                    :computer-voice-enabled="isComputerVoiceEnabled"
+                    :mobile-voice-enabled="isMobileVoiceEnabled"
+                    @speak="speakMessage"
                 />
             </div>
         </div>
 
         <div class="input-area">
             <div class="composer-field">
-                <button
-                    type="button"
-                    class="command-prefix memory-command"
-                    :class="{ active: useLongTermRecall }"
-                    :aria-pressed="useLongTermRecall"
-                    :disabled="isSending || isConversationLoading || !activeConversationId"
-                    title="联想长期记忆"
-                    @click="useLongTermRecall = !useLongTermRecall"
-                >
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 16Z" /></svg>
-                    <span>联想</span>
-                </button>
+                <div class="command-menu-wrap">
+                    <button
+                        type="button"
+                        class="command-prefix command-menu-trigger"
+                        :aria-expanded="isComposerMenuOpen"
+                        aria-label="更多聊天选项"
+                        aria-controls="composerCommandMenu"
+                        :disabled="isSending || isConversationLoading || !activeConversationId"
+                        title="更多聊天选项"
+                        @click="isComposerMenuOpen = !isComposerMenuOpen"
+                    >
+                        <span aria-hidden="true">+</span>
+                    </button>
+                    <div v-if="isComposerMenuOpen" id="composerCommandMenu" class="command-menu" role="menu">
+                        <button type="button" role="menuitemcheckbox" :aria-checked="useLongTermRecall" :class="{ active: useLongTermRecall }" @click="toggleRecallMode">
+                            <span>联想模式</span><span class="command-menu-state">{{ useLongTermRecall ? '已开启' : '关闭' }}</span>
+                        </button>
+                        <button type="button" role="menuitemcheckbox" :aria-checked="isComputerVoiceEnabled" :class="{ active: isComputerVoiceEnabled }" @click="toggleVoiceAction('computer')">
+                            <span>电脑播放</span><span class="command-menu-state">{{ isComputerVoiceEnabled ? '已开启' : '关闭' }}</span>
+                        </button>
+                        <button type="button" role="menuitemcheckbox" :aria-checked="isMobileVoiceEnabled" :class="{ active: isMobileVoiceEnabled }" @click="toggleVoiceAction('mobile')">
+                            <span>手机播放</span><span class="command-menu-state">{{ isMobileVoiceEnabled ? '已开启' : '关闭' }}</span>
+                        </button>
+                    </div>
+                </div>
                 <textarea
                     ref="messageInput"
                     v-model="draft"
@@ -745,18 +798,6 @@ onBeforeUnmount(() => {
                     @touchmove.stop
                 />
             </div>
-            <button
-                type="button"
-                class="memory-toggle legacy-memory-toggle"
-                :class="{ active: useLongTermRecall }"
-                :aria-pressed="useLongTermRecall"
-                :disabled="isSending || isConversationLoading || !activeConversationId"
-                title="联想长期记忆"
-                @click="useLongTermRecall = !useLongTermRecall"
-            >
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3ZM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z" /></svg>
-                <span>联想</span>
-            </button>
             <button
                 type="button"
                 class="send-button"
